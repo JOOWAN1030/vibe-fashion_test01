@@ -82,6 +82,38 @@ SET price = EXCLUDED.price,
     sale_price = EXCLUDED.sale_price,
     description = EXCLUDED.description;
 
+-- 상품 5: 컨스트럭션 아우터 (아우터, 20,000원)
+INSERT INTO public.products (category_id, name, slug, description, price, sale_price, status)
+SELECT 
+    id,
+    '컨스트럭션 아우터',
+    'construction-outer',
+    '내구성이 뛰어나고 워크웨어 무드가 돋보이는 모던한 컨스트럭션 자켓입니다.',
+    20000,
+    NULL,
+    'active'
+FROM public.categories WHERE slug = 'outer'
+ON CONFLICT (slug) DO UPDATE 
+SET price = EXCLUDED.price,
+    sale_price = EXCLUDED.sale_price,
+    description = EXCLUDED.description;
+
+-- 상품 6: 척테일러 올스타 언얼스드 (신발, 69,000원)
+INSERT INTO public.products (category_id, name, slug, description, price, sale_price, status)
+SELECT 
+    id,
+    '척테일러 올스타 언얼스드',
+    'chuck-taylor-all-star-unearthed',
+    '내추럴한 어스톤 무드와 편안한 착화감을 자랑하는 클래식 스니커즈입니다.',
+    69000,
+    NULL,
+    'active'
+FROM public.categories WHERE slug = 'shoes'
+ON CONFLICT (slug) DO UPDATE 
+SET price = EXCLUDED.price,
+    sale_price = EXCLUDED.sale_price,
+    description = EXCLUDED.description;
+
 -- 3. 첫 번째 상품(베이직 크롭 티셔츠) 옵션 9개 (블랙/화이트/베이지 × S/M/L)
 WITH p AS (
     SELECT id FROM public.products WHERE slug = 'basic-crop-tshirt'
@@ -139,3 +171,55 @@ SELECT p.id, 'https://picsum.photos/id/1011/800/1000', true, 1
 FROM public.products p
 WHERE p.slug = 'floral-midi-dress'
   AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://picsum.photos/id/1011/800/1000');
+
+-- 상품 5: 컨스트럭션 아우터 이미지
+INSERT INTO public.product_images (product_id, image_url, is_primary, sort_order)
+SELECT p.id, 'https://picsum.photos/id/1069/800/1000', true, 1
+FROM public.products p
+WHERE p.slug = 'construction-outer'
+  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://picsum.photos/id/1069/800/1000');
+
+-- 상품 6: 척테일러 올스타 언얼스드 이미지
+INSERT INTO public.product_images (product_id, image_url, is_primary, sort_order)
+SELECT p.id, 'https://picsum.photos/id/103/800/1000', true, 1
+FROM public.products p
+WHERE p.slug = 'chuck-taylor-all-star-unearthed'
+  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://picsum.photos/id/103/800/1000');
+
+-- 5. 신규 상품 옵션 및 재고 등록
+-- 컨스트럭션 아우터 옵션 (검정 × M/L/XL)
+WITH p AS (
+    SELECT id FROM public.products WHERE slug = 'construction-outer'
+),
+opts AS (
+    SELECT '검정' AS color, 'M' AS size, 30 AS stock UNION ALL
+    SELECT '검정' AS color, 'L' AS size, 40 AS stock UNION ALL
+    SELECT '검정' AS color, 'XL' AS size, 20 AS stock
+)
+INSERT INTO public.product_options (product_id, color, size, stock_quantity, additional_price)
+SELECT p.id, opts.color, opts.size, opts.stock, 0
+FROM p
+CROSS JOIN opts
+WHERE NOT EXISTS (
+    SELECT 1 FROM public.product_options po 
+    WHERE po.product_id = p.id AND po.color = opts.color AND po.size = opts.size
+);
+
+-- 척테일러 올스타 언얼스드 옵션 (갈색 × 250/260/270/280)
+WITH p AS (
+    SELECT id FROM public.products WHERE slug = 'chuck-taylor-all-star-unearthed'
+),
+opts AS (
+    SELECT '갈색' AS color, '250' AS size, 20 AS stock UNION ALL
+    SELECT '갈색' AS color, '260' AS size, 30 AS stock UNION ALL
+    SELECT '갈색' AS color, '270' AS size, 30 AS stock UNION ALL
+    SELECT '갈색' AS color, '280' AS size, 15 AS stock
+)
+INSERT INTO public.product_options (product_id, color, size, stock_quantity, additional_price)
+SELECT p.id, opts.color, opts.size, opts.stock, 0
+FROM p
+CROSS JOIN opts
+WHERE NOT EXISTS (
+    SELECT 1 FROM public.product_options po 
+    WHERE po.product_id = p.id AND po.color = opts.color AND po.size = opts.size
+);

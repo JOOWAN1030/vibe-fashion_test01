@@ -26,8 +26,7 @@ if SUPABASE_URL and SUPABASE_ANON_KEY:
 def index():
     """
     메인 쇼핑몰 홈 화면
-    - Supabase products 테이블에서 is_active=true이고 is_featured=true인 상품 최대 4개 조회
-      (is_featured 컬럼이 테이블에 없을 경우 is_active=true 기준으로 조회하도록 fallback 처리)
+    - Supabase products 테이블에서 활성(status='active') 상품 조회
     - 가격 포맷팅 및 에러 핸들링
     """
     products = []
@@ -35,25 +34,22 @@ def index():
     try:
         if supabase:
             raw_products = []
-            # 1. 요구사항인 is_active=true, is_featured=true 조건 시도
+            # status='active' 조건으로 최신 상품 순으로 조회
             try:
                 response = (
                     supabase.table("products")
                     .select("*, product_images(image_url, is_primary)")
-                    .eq("is_active", True)
-                    .eq("is_featured", True)
-                    .limit(4)
+                    .eq("status", "active")
+                    .order("created_at", desc=False)
                     .execute()
                 )
                 raw_products = response.data or []
             except Exception as query_err:
-                # is_featured 컬럼이 없을 경우 대비 fallback
-                print(f"[Supabase Notice] is_featured 조건 조회 실패 ({query_err}), is_active 기준으로 조회합니다.", file=sys.stderr)
+                # status 컬럼 또는 기타 조회 실패 시 fallback
+                print(f"[Supabase Notice] 기본 조회 실패 ({query_err}), 전체 조회 fallback.", file=sys.stderr)
                 response = (
                     supabase.table("products")
                     .select("*, product_images(image_url, is_primary)")
-                    .eq("is_active", True)
-                    .limit(4)
                     .execute()
                 )
                 raw_products = response.data or []
