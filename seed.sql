@@ -138,53 +138,48 @@ WHERE NOT EXISTS (
     WHERE po.product_id = p.id AND po.color = opts.color AND po.size = opts.size
 );
 
--- 4. 썸네일 이미지 등록 (picsum.photos 무료 이미지)
+-- 4. 썸네일 이미지 등록
 -- 상품 1: 베이직 크롭 티셔츠 이미지
 INSERT INTO public.product_images (product_id, image_url, is_primary, sort_order)
-SELECT p.id, img.url, img.is_primary, img.sort_order
+SELECT p.id, 'https://static-resource.mlb-korea.com/cdn-cgi/image/q=75,w=1668,format=auto,fit=scale-down,onerror=redirect/images/goods/ec/M26S3FTSB126350BKS/thnail/0068DD5346C5436ABA173B6675370BC8.png', true, 1
 FROM public.products p
-CROSS JOIN (
-    VALUES 
-        ('https://picsum.photos/id/1059/800/1000', true, 1),
-        ('https://picsum.photos/id/1062/800/1000', false, 2)
-) AS img(url, is_primary, sort_order)
 WHERE p.slug = 'basic-crop-tshirt'
-  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = img.url);
+  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://static-resource.mlb-korea.com/cdn-cgi/image/q=75,w=1668,format=auto,fit=scale-down,onerror=redirect/images/goods/ec/M26S3FTSB126350BKS/thnail/0068DD5346C5436ABA173B6675370BC8.png');
 
 -- 상품 2: 와이드 데님 팬츠 이미지
 INSERT INTO public.product_images (product_id, image_url, is_primary, sort_order)
-SELECT p.id, 'https://picsum.photos/id/1025/800/1000', true, 1
+SELECT p.id, 'https://img.ssfshop.com/cmd/LB_750x1000/src/https://img.ssfshop.com/goods/8SBR/24/08/19/GM0024081982620_0_THNAIL_ORGINL_20240822164421561.jpg', true, 1
 FROM public.products p
 WHERE p.slug = 'wide-denim-pants'
-  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://picsum.photos/id/1025/800/1000');
+  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://img.ssfshop.com/cmd/LB_750x1000/src/https://img.ssfshop.com/goods/8SBR/24/08/19/GM0024081982620_0_THNAIL_ORGINL_20240822164421561.jpg');
 
 -- 상품 3: 오버핏 코튼 자켓 이미지
 INSERT INTO public.product_images (product_id, image_url, is_primary, sort_order)
-SELECT p.id, 'https://picsum.photos/id/1070/800/1000', true, 1
+SELECT p.id, 'https://covernat.co.kr/web/product/extra/big/20251015/766dc5d2a11b0417d5c9e746f56facc3.jpg', true, 1
 FROM public.products p
 WHERE p.slug = 'overfit-cotton-jacket'
-  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://picsum.photos/id/1070/800/1000');
+  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://covernat.co.kr/web/product/extra/big/20251015/766dc5d2a11b0417d5c9e746f56facc3.jpg');
 
 -- 상품 4: 플로럴 미디 원피스 이미지
 INSERT INTO public.product_images (product_id, image_url, is_primary, sort_order)
-SELECT p.id, 'https://picsum.photos/id/1011/800/1000', true, 1
+SELECT p.id, 'https://thumb.cjonstyle.net/unsafe/fit-in/470x470/itemimage.cjonstyle.net/goods_images/20/442/2064699442L.jpg?timestamp=20260803191600', true, 1
 FROM public.products p
 WHERE p.slug = 'floral-midi-dress'
-  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://picsum.photos/id/1011/800/1000');
+  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://thumb.cjonstyle.net/unsafe/fit-in/470x470/itemimage.cjonstyle.net/goods_images/20/442/2064699442L.jpg?timestamp=20260803191600');
 
 -- 상품 5: 컨스트럭션 아우터 이미지
 INSERT INTO public.product_images (product_id, image_url, is_primary, sort_order)
-SELECT p.id, 'https://picsum.photos/id/1069/800/1000', true, 1
+SELECT p.id, 'https://image.production.fruitsfamily.com/public/product/resized%40width1125/fC5TOfKvU9-72ECE7E0-C812-4D2C-9F09-36CF3F277B81.jpg', true, 1
 FROM public.products p
 WHERE p.slug = 'construction-outer'
-  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://picsum.photos/id/1069/800/1000');
+  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://image.production.fruitsfamily.com/public/product/resized%40width1125/fC5TOfKvU9-72ECE7E0-C812-4D2C-9F09-36CF3F277B81.jpg');
 
 -- 상품 6: 척테일러 올스타 언얼스드 이미지
 INSERT INTO public.product_images (product_id, image_url, is_primary, sort_order)
-SELECT p.id, 'https://picsum.photos/id/103/800/1000', true, 1
+SELECT p.id, 'https://image.msscdn.net/thumbnails/images/goods_img/20260831/7205930/7205930_17881638240251_big.jpg?w=1200', true, 1
 FROM public.products p
 WHERE p.slug = 'chuck-taylor-all-star-unearthed'
-  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://picsum.photos/id/103/800/1000');
+  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://image.msscdn.net/thumbnails/images/goods_img/20260831/7205930/7205930_17881638240251_big.jpg?w=1200');
 
 -- 5. 신규 상품 옵션 및 재고 등록
 -- 컨스트럭션 아우터 옵션 (검정 × M/L/XL)
