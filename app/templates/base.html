@@ -3,181 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}VIBE FASHION - 감각적인 컨템포러리 아틀리에{% endblock %}</title>
+    <title>{% block title %}VIBE STORE - 대한민국 No.1 온라인 패션 스토어{% endblock %}</title>
 
     <!-- Bootstrap 5.3 CDN CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- Bootstrap Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Google Fonts: 타이포그래피 컬렉션 -->
+    <!-- Google Fonts: 무신사 모던 산세리프 폰트 체계 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- 커스텀 스타일 시트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- 무신사 테마 스타일 시트 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="d-flex flex-column min-vh-100 bg-page text-dark font-sans">
+<body class="d-flex flex-column min-vh-100 bg-white">
 
-    <!-- 상단 프로모션 공지 띠배너 (Ticker Banner) -->
-    <div class="top-announcement-bar py-2 text-center text-white small fw-medium">
-        <div class="container d-flex justify-content-center align-items-center gap-2">
-            <span class="badge badge-subtle-gold">NEW SEASON</span>
-            <span>첫 구매 고객 15% 웰컴 쿠폰팩 증정 &amp; 전 상품 무료 배송 혜택</span>
-            <a href="#products" class="text-white text-decoration-underline ms-2 d-none d-sm-inline">지금 쇼핑하기</a>
+    <!-- 1. 무신사 상단 서비스 탭 & 유틸리티 바 (Top Bar) -->
+    <div class="ms-top-bar d-none d-md-block">
+        <div class="container-xl d-flex justify-content-between align-items-center h-100 px-3">
+            <!-- 좌측 서비스 패밀리 탭 -->
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('main.index') }}" class="ms-service-tab active">무신사 스토어</a>
+                <a href="#" class="ms-service-tab">무신사 뷰티</a>
+                <a href="#" class="ms-service-tab">플레이어</a>
+                <a href="#" class="ms-service-tab">아울렛</a>
+                <a href="#" class="ms-service-tab">스냅</a>
+            </div>
+
+            <!-- 우측 계정 & 고객센터 유틸리티 -->
+            <div class="d-flex align-items-center">
+                {% if session.get('user') %}
+                <span class="ms-top-util-link fw-bold text-dark">
+                    <i class="bi bi-person-circle me-1"></i>{{ session['user']['name'] }}님
+                </span>
+                <span class="ms-util-divider">|</span>
+                <a href="#" class="ms-top-util-link">마이페이지</a>
+                <span class="ms-util-divider">|</span>
+                <a href="#" class="ms-top-util-link">주문배송조회</a>
+                <span class="ms-util-divider">|</span>
+                <a href="{{ url_for('auth.logout') }}" class="ms-top-util-link text-danger">로그아웃</a>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="ms-top-util-link">로그인</a>
+                <span class="ms-util-divider">|</span>
+                <a href="{{ url_for('auth.register') }}" class="ms-top-util-link fw-bold text-dark">회원가입 (15% 쿠폰)</a>
+                {% endif %}
+                <span class="ms-util-divider">|</span>
+                <a href="{{ url_for('board.list_inquiries', type='product') }}" class="ms-top-util-link">상품문의</a>
+                <span class="ms-util-divider">|</span>
+                <a href="{{ url_for('board.list_inquiries', type='shipping') }}" class="ms-top-util-link">배송문의</a>
+                <span class="ms-util-divider">|</span>
+                <a href="{{ url_for('board.list_inquiries') }}" class="ms-top-util-link">고객센터</a>
+            </div>
         </div>
     </div>
 
-    <!-- 네비게이션 헤더 (GNB) - 모던 글래스모피즘 스티키 바 -->
-    <header class="site-header sticky-top">
-        <nav class="navbar navbar-expand-lg navbar-light py-3">
-            <div class="container">
-                <!-- 브랜드 로고 -->
-                <a class="navbar-brand d-inline-flex align-items-center gap-2" href="{{ url_for('main.index') }}">
-                    <span class="logo-mark">V</span>
-                    <span class="brand-text font-serif">VIBE FASHION</span>
-                    <span class="logo-sub-tag font-editorial">Atelier</span>
+    <!-- 2. 무신사 메인 헤더 (로고, 캡슐 검색창, 유틸리티 아이콘) -->
+    <header class="ms-main-header border-bottom">
+        <div class="container-xl px-3">
+            <div class="d-flex align-items-center justify-content-between gap-3">
+                <!-- 무신사 볼드 로고 -->
+                <a href="{{ url_for('main.index') }}" class="ms-logo text-decoration-none">
+                    MUSINSA
+                    <span class="ms-logo-tag">VIBE</span>
                 </a>
-                
-                <!-- 모바일 햄버거 토글 -->
-                <button class="navbar-toggler border-0 shadow-none px-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="메뉴 토글">
-                    <i class="bi bi-list fs-2 text-dark"></i>
-                </button>
 
-                <!-- 네비게이션 메뉴 및 검색창 -->
-                <div class="collapse navbar-collapse" id="navbarContent">
-                    <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gnb-nav-list">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="{{ url_for('main.index') }}">홈</a>
-                        </li>
-                        <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.index') }}#products">신상품</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.index') }}#products">베스트</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('board.list_inquiries', type='product') }}">상품문의</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('board.list_inquiries', type='shipping') }}">배송문의</a>
-                            <input type="text" id="searchInput" class="search-input" placeholder="스타일 또는 아이템 검색..." oninput="handleSearch(this.value)">
-                        </div>
-
-                        <button class="btn btn-action-icon" type="button" title="위시리스트" id="wishlistHeaderBtn">
-                            <i class="bi bi-heart"></i>
-                            <span id="wishlistCount" class="action-badge">0</span>
+                <!-- 중앙 캡슐형 통합 검색창 -->
+                <div class="ms-search-capsule d-none d-md-block flex-grow-1 mx-lg-4">
+                    <div class="ms-search-input-wrap">
+                        <input type="text" id="searchInput" class="ms-search-input" 
+                               placeholder="브랜드, 상품, 프로모션 검색" 
+                               oninput="handleSearch(this.value)">
+                        <button type="button" class="ms-search-btn" title="검색">
+                            <i class="bi bi-search"></i>
                         </button>
-
-                        <button class="btn btn-action-cart position-relative d-inline-flex align-items-center gap-2" type="button" id="cartBtn">
-                            <i class="bi bi-bag"></i>
-                            <span class="d-none d-sm-inline font-sans fw-semibold">BAG</span>
-                            <span id="cartCount" class="badge-cart-pill">0</span>
-                        </button>
-
-                        <!-- 회원 인증 메뉴 (로그인 상태에 따라 분기) -->
-                        {% if session.get('user') %}
-                        <div class="dropdown ms-1">
-                            <button class="btn btn-user-profile d-inline-flex align-items-center gap-2 dropdown-toggle" type="button" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                <span class="user-avatar-circle"><i class="bi bi-person-fill"></i></span>
-                                <span class="small font-sans fw-semibold text-dark d-none d-md-inline">{{ session['user']['name'] }}</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 user-dropdown-menu" aria-labelledby="userMenuBtn">
-                                <li class="dropdown-header small text-muted font-sans">{{ session['user']['email'] }}</li>
-                                <li><a class="dropdown-item small py-2" href="#"><i class="bi bi-clock-history me-2"></i>주문 / 배송 조회</a></li>
-                                <li><a class="dropdown-item small py-2" href="#"><i class="bi bi-ticket-perforated me-2"></i>보유 쿠폰 (15% 웰컴팩)</a></li>
-                                <li><a class="dropdown-item small py-2" href="#"><i class="bi bi-heart me-2"></i>관심 상품 (위시리스트)</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item small py-2 text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>로그아웃</a></li>
-                            </ul>
-                        </div>
-                        {% else %}
-                        <div class="d-flex align-items-center gap-1 ms-1">
-                            <a href="{{ url_for('auth.login') }}" class="btn btn-auth-login small font-sans fw-semibold">
-                                로그인
-                            </a>
-                            <a href="{{ url_for('auth.register') }}" class="btn btn-auth-register small font-sans fw-semibold d-none d-sm-inline-block">
-                                회원가입
-                            </a>
-                        </div>
-                        {% endif %}
+                    </div>
+                    <!-- 실시간 트렌드 키워드 태그 -->
+                    <div class="ms-popular-tags">
+                        <span class="text-ms-red fw-bold">HOT</span>
+                        <a href="javascript:void(0)" onclick="quickFilter('outer')" class="ms-tag-link">#아우터</a>
+                        <a href="javascript:void(0)" onclick="quickFilter('shoes')" class="ms-tag-link">#스니커즈</a>
+                        <a href="javascript:void(0)" onclick="quickFilter('bottom')" class="ms-tag-link">#와이드데님</a>
+                        <a href="javascript:void(0)" onclick="quickFilter('top')" class="ms-tag-link">#크롭티</a>
+                        <a href="javascript:void(0)" onclick="quickFilter('dress')" class="ms-tag-link">#원피스</a>
                     </div>
                 </div>
+
+                <!-- 우측 액션 아이콘 (찜, 장바구니, 모바일 계정) -->
+                <div class="d-flex align-items-center gap-2">
+                    <button class="ms-header-action-btn" type="button" title="좋아요 / 위시리스트" id="wishlistHeaderBtn">
+                        <i class="bi bi-heart"></i>
+                        <span id="wishlistCount" class="ms-badge-counter">0</span>
+                    </button>
+
+                    <button class="ms-header-action-btn" type="button" title="장바구니" id="cartBtn">
+                        <i class="bi bi-bag"></i>
+                        <span id="cartCount" class="ms-badge-counter">0</span>
+                    </button>
+
+                    {% if session.get('user') %}
+                    <a href="{{ url_for('auth.logout') }}" class="ms-header-action-btn d-md-none" title="로그아웃">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="ms-header-action-btn d-md-none" title="로그인">
+                        <i class="bi bi-person"></i>
+                    </a>
+                    {% endif %}
+                </div>
             </div>
-        </nav>
+
+            <!-- 모바일용 검색창 (모바일 화면 시 표시) -->
+            <div class="d-md-none mt-2 pt-2 border-top">
+                <div class="ms-search-input-wrap">
+                    <input type="text" class="ms-search-input" placeholder="브랜드, 상품 검색" oninput="handleSearch(this.value)">
+                    <button type="button" class="ms-search-btn"><i class="bi bi-search"></i></button>
+                </div>
+            </div>
+        </div>
     </header>
+
+    <!-- 3. 무신사 GNB 네비게이션 바 (Sticky GNB) -->
+    <nav class="ms-gnb-bar">
+        <div class="container-xl px-3">
+            <ul class="ms-gnb-menu">
+                <li class="ms-gnb-item">
+                    <a href="{{ url_for('main.index') }}" class="ms-gnb-link active">랭킹</a>
+                </li>
+                <li class="ms-gnb-item">
+                    <a href="{{ url_for('main.index') }}#ranking" class="ms-gnb-link">신상품</a>
+                </li>
+                <li class="ms-gnb-item">
+                    <a href="{{ url_for('main.index') }}#ranking" class="ms-gnb-link ms-gnb-highlight">세일</a>
+                </li>
+                <li class="ms-gnb-item">
+                    <a href="{{ url_for('main.index') }}#ranking" class="ms-gnb-link">브랜드</a>
+                </li>
+                <li class="ms-gnb-item">
+                    <a href="{{ url_for('main.index') }}#ranking" class="ms-gnb-link">스페셜</a>
+                </li>
+                <li class="ms-gnb-item">
+                    <a href="{{ url_for('board.list_inquiries', type='product') }}" class="ms-gnb-link">상품문의</a>
+                </li>
+                <li class="ms-gnb-item">
+                    <a href="{{ url_for('board.list_inquiries', type='shipping') }}" class="ms-gnb-link">배송문의</a>
+                </li>
+                <li class="ms-gnb-item">
+                    <a href="{{ url_for('board.list_inquiries') }}" class="ms-gnb-link">고객센터</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
     <!-- 메인 본문 영역 -->
     <main class="flex-grow-1">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- 프리미엄 푸터 -->
-    <footer class="site-footer bg-navy text-light py-5 mt-5">
-        <div class="container pt-3">
-            <div class="row g-5">
+    <!-- 4. 무신사 시그니처 하이덴시티 모노크롬 푸터 -->
+    <footer class="ms-footer">
+        <div class="container-xl px-3">
+            <!-- 상단 이용 메뉴 -->
+            <div class="ms-footer-menu">
+                <a href="#">회사소개</a>
+                <a href="#">공지사항</a>
+                <a href="#">입점상담</a>
+                <a href="#">제휴문의</a>
+                <a href="#">이용약관</a>
+                <a href="#" class="fw-bold text-dark">개인정보처리방침</a>
+                <a href="{{ url_for('board.list_inquiries', type='product') }}">상품 Q&amp;A</a>
+                <a href="{{ url_for('board.list_inquiries', type='shipping') }}">배송조회</a>
+            </div>
+
+            <div class="row g-4">
+                <!-- 고객센터 정보 -->
                 <div class="col-lg-4 col-md-6">
-                    <a class="footer-brand font-serif fs-3 text-white text-decoration-none d-inline-block mb-3" href="{{ url_for('main.index') }}">
-                        VIBE FASHION
-                    </a>
-                    <p class="text-white-50 small mb-4 pe-lg-4 lh-lg">
-                        도시적인 감성과 편안함이 공존하는 컨템포러리 실루엣.<br>
-                        일상의 모든 순간에 감각적인 무드를 더하는 프리미엄 셀렉션.
+                    <div class="text-dark fw-bold mb-1">무신사 VIBE 고객센터</div>
+                    <div class="ms-cs-number">1544-7199</div>
+                    <p class="mb-2 text-muted extra-small">
+                        운영시간: 평일 09:00 ~ 18:00 (토, 일, 공휴일 휴무)<br>
+                        점심시간: 12:00 ~ 13:00
                     </p>
-                    <div class="footer-social-links d-flex gap-3">
-                        <a href="#" class="social-circle-link" title="Instagram"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="social-circle-link" title="YouTube"><i class="bi bi-youtube"></i></a>
-                        <a href="#" class="social-circle-link" title="Pinterest"><i class="bi bi-pinterest"></i></a>
+                    <div class="d-flex gap-2 mt-2">
+                        <a href="{{ url_for('board.create_inquiry') }}" class="btn btn-outline-dark btn-sm rounded-0 fw-bold px-3 py-1 extra-small">
+                            1:1 문의하기
+                        </a>
+                        <a href="{{ url_for('board.list_inquiries') }}" class="btn btn-outline-secondary btn-sm rounded-0 px-3 py-1 extra-small">
+                            자주 묻는 질문(FAQ)
+                        </a>
                     </div>
                 </div>
 
-                <div class="col-lg-2 col-md-3 col-6">
-                    <h6 class="footer-section-title">COLLECTION</h6>
-                    <ul class="list-unstyled footer-menu-list">
-                        <li><a href="#products">2026 S/S 시그니처</a></li>
-                        <li><a href="#products">워크웨어 &amp; 아우터</a></li>
-                        <li><a href="#products">모던 와이드 데님</a></li>
-                        <li><a href="#products">에센셜 스니커즈</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-lg-2 col-md-3 col-6">
-                    <h6 class="footer-section-title">SERVICE</h6>
-                    <ul class="list-unstyled footer-menu-list">
-                        <li><a href="{{ url_for('board.list_inquiries', type='shipping') }}">주문 / 배송 조회</a></li>
-                        <li><a href="{{ url_for('board.list_inquiries', type='product') }}">상품 Q&amp;A 게시판</a></li>
-                        <li><a href="{{ url_for('board.create_inquiry') }}">1:1 문의 접수</a></li>
-                        <li><a href="#">멤버십 등급 안내</a></li>
-                    </ul>
-                </div>
-
-                <div class="col-lg-4 col-md-12">
-                    <h6 class="footer-section-title">NEWSLETTER</h6>
-                    <p class="text-white-50 small mb-3">
-                        VIBE FASHION의 새로운 드롭과 프라이빗 세일 소식을 가장 먼저 받아보세요.
+                <!-- 사업자 및 에스크로 정보 -->
+                <div class="col-lg-5 col-md-6 ms-footer-company-info">
+                    <p class="mb-1 fw-bold text-dark">(주)무신사 VIBE 스토어</p>
+                    <p class="mb-0">
+                        대표이사: 조만호, 한문일 | 서울특별시 성동구 아차산로 13길 11 무신사 캠퍼스<br>
+                        사업자등록번호: 211-88-40000 | 통신판매업신고: 2026-서울성동-0000<br>
+                        호스팅서비스: Microsoft Azure Web Apps | 이메일: cs@musinsa-vibe.com
                     </p>
-                    <form class="newsletter-form d-flex gap-2" onsubmit="event.preventDefault(); alert('뉴스레터 구독 신청이 완료되었습니다.');">
-                        <input type="email" class="form-control newsletter-input" placeholder="이메일 주소를 입력하세요" required>
-                        <button type="submit" class="btn btn-gold px-4 fw-semibold">구독</button>
-                    </form>
-                    <p class="text-white-50 extra-small mt-2 mb-0">
-                        * 구독 신청 시 마케팅 정보 수신에 동의하는 것으로 간주됩니다.
+                    <p class="mt-2 text-muted extra-small mb-0">
+                        KG이니시스 구매안전(에스크로) 서비스: 고객님의 안전거래를 위해 현금 등으로 결제 시 결제금액 전액에 대해 안전 결제를 보장합니다.
                     </p>
                 </div>
-            </div>
 
-            <!-- 하단 카피라이트 -->
-            <div class="border-top border-white border-opacity-10 mt-5 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-                <p class="text-white-50 extra-small mb-0">
-                    &copy; 2026 VIBE FASHION Atelier Co. All rights reserved.
-                </p>
-                <div class="d-flex gap-4 extra-small">
-                    <a href="#" class="text-white-50 text-decoration-none">이용약관</a>
-                    <a href="#" class="text-white-50 text-decoration-none fw-semibold">개인정보처리방침</a>
-                    <a href="#" class="text-white-50 text-decoration-none">사업자 정보확인</a>
+                <!-- SNS 및 인증마크 -->
+                <div class="col-lg-3 col-md-12 text-lg-end">
+                    <div class="d-flex justify-content-lg-end gap-3 fs-5 text-dark mb-3">
+                        <a href="#" title="Instagram"><i class="bi bi-instagram"></i></a>
+                        <a href="#" title="YouTube"><i class="bi bi-youtube"></i></a>
+                        <a href="#" title="Facebook"><i class="bi bi-facebook"></i></a>
+                    </div>
+                    <div class="text-muted extra-small">
+                        &copy; 2026 MUSINSA VIBE Co., Ltd. All rights reserved.
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
+
+    <!-- Bootstrap 5.3 CDN JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- 커스텀 JS 스크립트 -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
 
     <!-- Bootstrap 5.3 CDN JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

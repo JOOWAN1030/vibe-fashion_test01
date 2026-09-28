@@ -74,19 +74,33 @@ function toggleWishlist(button, productName) {
 }
 
 /**
- * 3. 카테고리 탭 필터링 기능
+ * 3. 카테고리 탭 필터링 기능 (무신사 랭킹 필터 지원)
  */
 function filterCategory(categorySlug, targetBtn) {
     activeFilter = categorySlug;
 
     // 탭 버튼 active 클래스 제어
-    const allTabs = document.querySelectorAll(".btn-filter-tab");
+    const allTabs = document.querySelectorAll(".ms-filter-pill, .btn-filter-tab");
     allTabs.forEach(tab => tab.classList.remove("active"));
     if (targetBtn) {
         targetBtn.classList.add("active");
     }
 
     applyFilters();
+}
+
+/**
+ * 인기 검색어 클릭 시 퀵 필터
+ */
+function quickFilter(categorySlug) {
+    const targetTab = Array.from(document.querySelectorAll(".ms-filter-pill")).find(
+        btn => btn.getAttribute("onclick")?.includes(`'${categorySlug}'`)
+    );
+    filterCategory(categorySlug, targetTab);
+    const rankingEl = document.getElementById("ranking");
+    if (rankingEl) {
+        rankingEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
 }
 
 /**
@@ -97,7 +111,7 @@ function handleSearch(query) {
 }
 
 /**
- * 5. 통합 필터링 (카테고리 + 검색어)
+ * 5. 통합 필터링 (카테고리 + 검색어 + 브랜드)
  */
 function applyFilters(searchQuery = "") {
     const productCols = document.querySelectorAll(".product-item-col");
@@ -107,11 +121,12 @@ function applyFilters(searchQuery = "") {
 
     productCols.forEach(col => {
         const cat = col.getAttribute("data-category") || "";
-        const title = (col.querySelector(".product-card-title")?.textContent || "").toLowerCase();
+        const title = (col.querySelector(".ms-goods-title, .product-card-title")?.textContent || "").toLowerCase();
+        const brand = (col.querySelector(".ms-brand-name")?.textContent || "").toLowerCase();
         const desc = (col.querySelector(".product-card-desc")?.textContent || "").toLowerCase();
 
         const matchesCategory = (activeFilter === "all") || (cat === activeFilter);
-        const matchesSearch = !currentSearch || title.includes(currentSearch) || desc.includes(currentSearch);
+        const matchesSearch = !currentSearch || title.includes(currentSearch) || brand.includes(currentSearch) || desc.includes(currentSearch);
 
         if (matchesCategory && matchesSearch) {
             col.classList.remove("d-none");
@@ -143,9 +158,9 @@ function applyFilters(searchQuery = "") {
  * 필터 리셋
  */
 function resetFilters() {
-    const searchInput = document.getElementById("searchInput");
-    if (searchInput) searchInput.value = "";
-    const firstTab = document.querySelector(".btn-filter-tab");
+    const searchInputs = document.querySelectorAll("#searchInput, .ms-search-input");
+    searchInputs.forEach(i => i.value = "");
+    const firstTab = document.querySelector(".ms-filter-pill, .btn-filter-tab");
     filterCategory('all', firstTab);
 }
 

@@ -1,33 +1,832 @@
-/* app/static/css/style.css - VIBE FASHION 모던 컨템포러리 디자인 시스템 */
+/* app/static/css/style.css - VIBE FASHION (무신사 MUSINSA 테마 스타일시트) */
 
 /* ============================================================
-   1. Google Fonts 임포트
-   - Serif: Playfair Display
-   - Editorial: Cormorant Garamond
-   - Sans: Plus Jakarta Sans / Montserrat / Noto Sans KR
+   1. Google Fonts 임포트 (모던 & 스트리트 볼드 산세리프)
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600&family=Montserrat:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
 /* ============================================================
-   2. 디자인 토큰 및 CSS 커스텀 변수
+   2. 무신사 스타일 컬러 및 디자인 토큰
    ============================================================ */
 :root {
-    --font-serif: 'Playfair Display', Georgia, serif;
-    --font-editorial: 'Cormorant Garamond', Georgia, serif;
-    --font-sans: 'Plus Jakarta Sans', 'Montserrat', 'Noto Sans KR', -apple-system, sans-serif;
+    --ms-font: 'Plus Jakarta Sans', 'Montserrat', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    
+    /* 무신사 핵심 컬러 */
+    --ms-black: #000000;
+    --ms-dark: #111111;
+    --ms-red: #f23e3e;         /* 무신사 시그니처 할인율 레드 */
+    --ms-blue: #0078ff;        /* 무신사 공식 인증 블루 */
+    --ms-gray-50: #fafafa;
+    --ms-gray-100: #f4f4f4;
+    --ms-gray-200: #eeeeee;
+    --ms-gray-300: #e0e0e0;
+    --ms-gray-400: #aaaaaa;
+    --ms-gray-600: #777777;
+    --ms-gray-800: #333333;
+    --ms-border: #e5e5e5;
 
-    /* 프레스티지 & 컨템포러리 컬러 팔레트 */
-    --color-navy: #0c121e;
-    --color-navy-card: #131b2e;
-    --color-dark: #121417;
-    --color-gold: #e5b369;
-    --color-gold-hover: #f3c785;
-    --color-gold-light: rgba(229, 179, 105, 0.15);
-    --color-coral: #ff5252;
-    --color-bg-page: #fbfbfd;
-    --color-surface: #ffffff;
-    --color-border: #eaecf0;
-    --color-text-sub: #667085;
+    --ms-transition: all 0.2s ease-in-out;
+}
+
+/* ============================================================
+   3. 글로벌 리셋 & 유틸리티
+   ============================================================ */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--ms-font);
+    background-color: #ffffff;
+    color: var(--ms-dark);
+    letter-spacing: -0.4px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+a:hover {
+    color: var(--ms-black);
+}
+
+.extra-small {
+    font-size: 11px;
+}
+
+.text-ms-red {
+    color: var(--ms-red) !important;
+}
+
+.text-ms-blue {
+    color: var(--ms-blue) !important;
+}
+
+.bg-ms-black {
+    background-color: var(--ms-black) !important;
+}
+
+/* ============================================================
+   4. 무신사 상단 탑 유틸리티 바 (Top Service Bar)
+   ============================================================ */
+.ms-top-bar {
+    height: 38px;
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--ms-gray-200);
+    font-size: 12px;
+}
+
+.ms-service-tab {
+    font-weight: 700;
+    color: var(--ms-gray-600);
+    padding: 0 12px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    letter-spacing: -0.2px;
+}
+
+.ms-service-tab:hover {
+    color: var(--ms-black);
+}
+
+.ms-service-tab.active {
+    color: var(--ms-black);
+    font-weight: 800;
+}
+
+.ms-service-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 12px;
+    right: 12px;
+    height: 2px;
+    background-color: var(--ms-black);
+}
+
+.ms-top-util-link {
+    color: var(--ms-gray-600);
+    font-size: 11px;
+    padding: 0 8px;
+    transition: var(--ms-transition);
+}
+
+.ms-top-util-link:hover {
+    color: var(--ms-black);
+    font-weight: 600;
+}
+
+.ms-util-divider {
+    color: var(--ms-gray-300);
+    font-size: 10px;
+}
+
+/* ============================================================
+   5. 무신사 메인 헤더 & 검색창 (Main Header)
+   ============================================================ */
+.ms-main-header {
+    background-color: #ffffff;
+    padding: 16px 0 12px;
+}
+
+.ms-logo {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--ms-black);
+    letter-spacing: -1.5px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+}
+
+.ms-logo-tag {
+    font-size: 10px;
+    font-weight: 800;
+    background: var(--ms-black);
+    color: #ffffff;
+    padding: 2px 5px;
+    border-radius: 2px;
+    margin-left: 6px;
+    letter-spacing: 0;
+}
+
+/* 무신사 시그니처 캡슐 검색창 */
+.ms-search-capsule {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+}
+
+.ms-search-input-wrap {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--ms-black);
+    border-radius: 40px;
+    padding: 4px 16px;
+    background-color: #ffffff;
+    transition: var(--ms-transition);
+}
+
+.ms-search-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 0;
+    color: var(--ms-dark);
+}
+
+.ms-search-btn {
+    border: none;
+    background: transparent;
+    color: var(--ms-black);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+/* 검색창 하단 실시간 인기 키워드 태그 */
+.ms-popular-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 11px;
+}
+
+.ms-tag-link {
+    color: var(--ms-gray-600);
+    transition: var(--ms-transition);
+}
+
+.ms-tag-link:hover {
+    color: var(--ms-black);
+    text-decoration: underline;
+}
+
+/* 헤더 우측 아이콘 액션 */
+.ms-header-action-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--ms-gray-200);
+    background: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--ms-dark);
+    position: relative;
+    transition: var(--ms-transition);
+}
+
+.ms-header-action-btn:hover {
+    border-color: var(--ms-black);
+    background-color: var(--ms-gray-50);
+}
+
+.ms-badge-counter {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background-color: var(--ms-red);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+/* ============================================================
+   6. 무신사 GNB 네비게이션 바 (Sticky GNB)
+   ============================================================ */
+.ms-gnb-bar {
+    background-color: #ffffff;
+    border-top: 1px solid var(--ms-gray-200);
+    border-bottom: 2px solid var(--ms-black);
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+.ms-gnb-menu {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.ms-gnb-menu::-webkit-scrollbar {
+    display: none;
+}
+
+.ms-gnb-item {
+    flex-shrink: 0;
+}
+
+.ms-gnb-link {
+    display: inline-block;
+    padding: 13px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ms-dark);
+    position: relative;
+    transition: var(--ms-transition);
+}
+
+.ms-gnb-link:hover {
+    color: var(--ms-black);
+}
+
+.ms-gnb-link.active {
+    color: var(--ms-black);
+    font-weight: 900;
+}
+
+.ms-gnb-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 18px;
+    right: 18px;
+    height: 3px;
+    background-color: var(--ms-black);
+}
+
+.ms-gnb-highlight {
+    color: var(--ms-red) !important;
+}
+
+/* ============================================================
+   7. 무신사 스타일 히어로 메인 배너
+   ============================================================ */
+.ms-hero-banner {
+    position: relative;
+    background-color: #111111;
+    color: #ffffff;
+    min-height: 420px;
+    overflow: hidden;
+}
+
+.ms-hero-slide {
+    position: relative;
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+}
+
+.ms-hero-slide-1 {
+    background-image: linear-gradient(90deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.2) 100%),
+                      url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1800&auto=format&fit=crop&q=80');
+}
+
+.ms-hero-badge {
+    display: inline-block;
+    background-color: var(--ms-red);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.ms-hero-title {
+    font-size: 38px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.ms-hero-desc {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 24px;
+    line-height: 1.6;
+}
+
+.ms-btn-shop-now {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #ffffff;
+    color: var(--ms-black);
+    font-size: 13px;
+    font-weight: 800;
+    padding: 10px 24px;
+    border: none;
+    transition: var(--ms-transition);
+}
+
+.ms-btn-shop-now:hover {
+    background-color: var(--ms-black);
+    color: #ffffff;
+}
+
+/* 배너 인디케이터 */
+.ms-hero-pagination {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* ============================================================
+   8. 무신사 랭킹 필터 바 (Ranking Category Filter)
+   ============================================================ */
+.ms-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--ms-black);
+    margin-bottom: 20px;
+}
+
+.ms-section-title {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--ms-black);
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.ms-section-sub {
+    font-size: 12px;
+    color: var(--ms-gray-600);
+    margin-left: 8px;
+}
+
+.ms-live-timestamp {
+    font-size: 11px;
+    color: var(--ms-gray-600);
+    font-weight: 500;
+}
+
+/* 카테고리 탭 필터 (무신사 랭킹 필터 스타일) */
+.ms-filter-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+}
+.ms-filter-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.ms-filter-pill {
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--ms-gray-300);
+    background-color: #ffffff;
+    color: var(--ms-gray-800);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: var(--ms-transition);
+}
+
+.ms-filter-pill:hover {
+    border-color: var(--ms-black);
+    color: var(--ms-black);
+}
+
+.ms-filter-pill.active {
+    background-color: var(--ms-black);
+    color: #ffffff;
+    border-color: var(--ms-black);
+    font-weight: 700;
+}
+
+/* ============================================================
+   9. 무신사 시그니처 상품 카드 (Musinsa Goods Card)
+   ============================================================ */
+.ms-goods-card {
+    background-color: #ffffff;
+    border: 1px solid var(--ms-gray-200);
+    position: relative;
+    transition: var(--ms-transition);
+    height: 100%;
+    display: flex;
+    flex-column;
+}
+
+.ms-goods-card:hover {
+    border-color: var(--ms-black);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* 상품 썸네일 박스 */
+.ms-thumb-box {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1.25;
+    background-color: var(--ms-gray-100);
+    overflow: hidden;
+}
+
+.ms-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.ms-goods-card:hover .ms-thumb-img {
+    transform: scale(1.03);
+}
+
+/* 랭킹 뱃지 (TOP 3는 레드, 나머지는 블랙) */
+.ms-rank-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    background-color: var(--ms-black);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.ms-rank-badge.top-rank {
+    background-color: var(--ms-red);
+}
+
+/* 위시리스트 버튼 */
+.ms-btn-like {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--ms-gray-200);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--ms-gray-600);
+    cursor: pointer;
+    z-index: 2;
+    transition: var(--ms-transition);
+}
+
+.ms-btn-like:hover {
+    color: var(--ms-red);
+    background-color: #ffffff;
+    transform: scale(1.1);
+}
+
+.ms-btn-like.active {
+    color: var(--ms-red);
+}
+
+/* 호버 시 나타나는 퀵 장바구니 바 */
+.ms-quick-cart-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.85);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    padding: 8px 0;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: var(--ms-transition);
+    z-index: 3;
+    border: none;
+    width: 100%;
+}
+
+.ms-goods-card:hover .ms-quick-cart-bar {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.ms-quick-cart-bar:hover {
+    background: var(--ms-black);
+    color: #ffffff;
+}
+
+/* 상품 텍스트 정보 */
+.ms-goods-info {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.ms-brand-name {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--ms-black);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+}
+
+.ms-goods-title {
+    font-size: 13px;
+    color: #222222;
+    font-weight: 500;
+    line-height: 1.35;
+    height: 35px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    margin-bottom: 8px;
+    text-decoration: none;
+}
+
+.ms-goods-title:hover {
+    text-decoration: underline;
+}
+
+/* 태그 뱃지 */
+.ms-tag-badge {
+    display: inline-block;
+    background-color: var(--ms-gray-100);
+    color: var(--ms-gray-800);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+    align-self: flex-start;
+}
+
+/* 가격 영역 */
+.ms-price-box {
+    margin-top: auto;
+    padding-top: 4px;
+}
+
+.ms-discount-rate {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--ms-red);
+    margin-right: 4px;
+}
+
+.ms-final-price {
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--ms-black);
+}
+
+.ms-orig-price {
+    font-size: 11px;
+    color: var(--ms-gray-400);
+    text-decoration: line-through;
+    margin-top: 1px;
+}
+
+/* 메타 정보 (좋아요수, 별점) */
+.ms-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--ms-gray-600);
+    border-top: 1px solid var(--ms-gray-200);
+    padding-top: 8px;
+    margin-top: 8px;
+}
+
+/* ============================================================
+   10. 무신사 스타일 고객센터 / 문의 게시판 (Board)
+   ============================================================ */
+.ms-board-wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.ms-board-title {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--ms-black);
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--ms-black);
+    margin-bottom: 24px;
+}
+
+.ms-board-tab-btn {
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 20px;
+    border: 1px solid var(--ms-gray-300);
+    background: #ffffff;
+    color: var(--ms-gray-600);
+    text-decoration: none;
+    transition: var(--ms-transition);
+}
+
+.ms-board-tab-btn:hover {
+    color: var(--ms-black);
+    border-color: var(--ms-black);
+}
+
+.ms-board-tab-btn.active {
+    background-color: var(--ms-black);
+    color: #ffffff;
+    border-color: var(--ms-black);
+}
+
+/* ============================================================
+   11. 무신사 스타일 인증 화면 (Login / Register)
+   ============================================================ */
+.ms-auth-container {
+    max-width: 440px;
+    margin: 60px auto;
+    padding: 0 16px;
+}
+
+.ms-auth-title {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--ms-black);
+    text-align: center;
+    margin-bottom: 24px;
+    letter-spacing: -1px;
+}
+
+.ms-form-control {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 13px;
+    border: 1px solid var(--ms-gray-300);
+    border-radius: 2px;
+    outline: none;
+    transition: var(--ms-transition);
+}
+
+.ms-form-control:focus {
+    border-color: var(--ms-black);
+}
+
+.ms-btn-black {
+    width: 100%;
+    padding: 14px 0;
+    background-color: var(--ms-black);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 800;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: var(--ms-transition);
+}
+
+.ms-btn-black:hover {
+    background-color: #222222;
+}
+
+/* ============================================================
+   12. 무신사 스타일 푸터 (High-Density Monochrome Footer)
+   ============================================================ */
+.ms-footer {
+    background-color: #ffffff;
+    border-top: 1px solid var(--ms-gray-200);
+    color: var(--ms-gray-600);
+    font-size: 12px;
+    padding: 40px 0 60px;
+    margin-top: 80px;
+}
+
+.ms-footer-menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--ms-gray-200);
+    margin-bottom: 24px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ms-footer-menu a {
+    color: var(--ms-dark);
+}
+.ms-footer-menu a:hover {
+    text-decoration: underline;
+}
+
+.ms-cs-number {
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--ms-black);
+    margin-bottom: 4px;
+}
+
+.ms-footer-company-info {
+    line-height: 1.8;
+    color: var(--ms-gray-600);
+    font-size: 11px;
+}
+
+/* ============================================================
+   13. 반응형 (모바일 2열 뷰)
+   ============================================================ */
+@media (max-width: 768px) {
+    .ms-hero-title {
+        font-size: 26px;
+    }
+    
+    .ms-search-capsule {
+        max-width: 100%;
+    }
+
+    .ms-thumb-box {
+        aspect-ratio: 1 / 1.2;
+    }
+
+    .ms-goods-title {
+        font-size: 12px;
+    }
+
+    .ms-final-price, .ms-discount-rate {
+        font-size: 14px;
+    }
+}
+
 
     /* 섀도우 시스템 */
     --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.04);

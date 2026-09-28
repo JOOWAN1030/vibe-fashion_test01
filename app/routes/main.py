@@ -104,10 +104,25 @@ def index():
                 cat_name = cat_info.get("name") if isinstance(cat_info, dict) else item.get("category", "")
                 cat_slug = cat_info.get("slug", "all") if isinstance(cat_info, dict) else "all"
 
+                # 무신사 스타일 브랜드 및 메타데이터 매핑
+                slug = item.get("slug", "")
+                brand_meta = {
+                    "basic-crop-tshirt": {"brand": "MLB", "likes": "4.8k", "reviews": 1248, "tag": "무료배송"},
+                    "wide-denim-pants": {"brand": "8SECONDS", "likes": "3.1k", "reviews": 892, "tag": "오늘출발"},
+                    "overfit-cotton-jacket": {"brand": "COVERNAT", "likes": "6.2k", "reviews": 2104, "tag": "단독"},
+                    "floral-midi-dress": {"brand": "VIBE SELECT", "likes": "1.5k", "reviews": 430, "tag": "무료배송"},
+                    "construction-outer": {"brand": "CARHARTT WIP", "likes": "8.9k", "reviews": 3412, "tag": "쿠폰"},
+                    "chuck-taylor-all-star-unearthed": {"brand": "CONVERSE", "likes": "12.4k", "reviews": 5920, "tag": "BEST"}
+                }.get(slug, {"brand": "VIBE STANDARD", "likes": "1.2k", "reviews": 350, "tag": "무료배송"})
+
                 products.append({
                     "id": item.get("id"),
                     "name": item.get("name", "상품명 없음"),
-                    "slug": item.get("slug", ""),
+                    "slug": slug,
+                    "brand": brand_meta["brand"],
+                    "likes": brand_meta["likes"],
+                    "reviews": brand_meta["reviews"],
+                    "tag": brand_meta["tag"],
                     "price": formatted_price,
                     "original_price": formatted_orig_price if discount_rate else None,
                     "discount_rate": discount_rate,

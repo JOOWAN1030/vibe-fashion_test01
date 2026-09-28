@@ -1,289 +1,195 @@
 {% extends "base.html" %}
 
-{% block title %}VIBE FASHION - 2026 S/S 컨템포러리 컬렉션{% endblock %}
+{% block title %}VIBE STORE - 무신사 스토어 랭킹 & 패션 쇼핑몰{% endblock %}
 
 {% block content %}
-<!-- 1. 히어로 비주얼 섹션 (Editorial Cinema Hero) -->
-<section class="hero-editorial-section position-relative overflow-hidden text-white d-flex align-items-center">
-    <!-- 배경 오버레이 및 그라디언트 앰비언트 라이트 -->
-    <div class="hero-bg-media"></div>
-    <div class="hero-gradient-overlay"></div>
-    
-    <div class="container position-relative z-2 py-5 my-md-4">
-        <div class="row align-items-center">
-            <div class="col-lg-8 col-xl-7">
-                <!-- 감성 서브 뱃지 -->
-                <div class="d-inline-flex align-items-center gap-2 hero-tag-pill mb-3">
-                    <span class="pulse-dot"></span>
-                    <span class="font-sans fw-semibold tracking-wide">2026 S/F BEST SEASON ESSENTIALS</span>
-                </div>
-
-                <!-- 에디토리얼 메인 헤드라인 -->
-                <h1 class="hero-headline font-serif fw-bold mb-3">
-                    Modern Silhouette,<br>
-                    <span class="font-editorial text-gold fst-italic">Effortless Elegance</span>
+<!-- 1. 무신사 스타일 메인 비주얼 배너 (Main Banner) -->
+<section class="ms-hero-banner">
+    <div class="ms-hero-slide ms-hero-slide-1">
+        <div class="container-xl px-3 py-5">
+            <div class="col-lg-7 col-md-9 col-12">
+                <span class="ms-hero-badge">2026 S/F BEST SEASON ESSENTIALS</span>
+                <h1 class="ms-hero-title">
+                    REAL-TIME RANKING<br>
+                    BEST FASHION DROP
                 </h1>
-
-                <!-- 설명 문구 -->
-                <p class="hero-subtext font-sans mb-4 text-white-50 pe-lg-5">
-                    동시대적 감각과 유려한 테일러링이 만나는 순간.<br class="d-none d-sm-inline">
-                    절제된 디테일과 고급스러운 패브릭으로 완성된 VIBE FASHION의 새로운 에센셜 컬렉션을 경험하세요.
+                <p class="ms-hero-desc">
+                    지금 거리와 무신사에서 가장 뜨거운 반응을 얻고 있는 베스트 아우터와 스니커즈.<br class="d-none d-sm-inline">
+                    최대 33% 시즌 할인과 첫 구매 전 품목 무료 배송 혜택을 만나보세요.
                 </p>
-
-                <!-- CTA 버튼 그룹 -->
-                <div class="d-flex flex-wrap align-items-center gap-3 pt-2">
-                    <a href="#products" class="btn btn-primary-luxury px-4 py-3 font-sans">
-                        <span>컬렉션 쇼핑하기</span>
-                        <i class="bi bi-arrow-right ms-2"></i>
-                    </a>
-                    <a href="#lookbook" class="btn btn-outline-luxury px-4 py-3 font-sans">
-                        <span>2026 룩북 보기</span>
+                <div class="d-flex gap-2">
+                    <a href="#ranking" class="ms-btn-shop-now">
+                        <span>랭킹 쇼핑하기</span>
+                        <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
             </div>
-
-            <!-- 우측 퀵 스탯 / 하이라이트 카드 (데스크탑 전용) -->
-            <div class="col-lg-4 col-xl-5 d-none d-lg-block">
-                <div class="hero-glass-card ms-auto p-4 rounded-4">
-                    <div class="d-flex align-items-center justify-content-between pb-3 border-bottom border-white border-opacity-10 mb-3">
-                        <span class="text-white-50 extra-small font-sans tracking-wide">CURATED DROP</span>
-                        <span class="badge bg-gold text-dark font-sans fw-bold">WEEKLY HOT</span>
-                    </div>
-                    <div class="d-flex align-items-center gap-3">
-                        <img src="https://image.production.fruitsfamily.com/public/product/resized%40width1125/fC5TOfKvU9-72ECE7E0-C812-4D2C-9F09-36CF3F277B81.jpg" alt="Featured Item" class="rounded-3 hero-thumb-img">
-                        <div>
-                            <span class="badge bg-white bg-opacity-10 text-white-75 extra-small mb-1">BEST OUTER</span>
-                            <h6 class="text-white fw-bold font-serif mb-1">컨스트럭션 아우터</h6>
-                            <p class="text-gold fw-bold font-sans mb-0">20,000원</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        </div>
+        <!-- 배너 슬라이드 카운터 인디케이터 -->
+        <div class="ms-hero-pagination d-none d-sm-block">
+            <span class="text-white">01</span> / <span class="text-white-50">06</span>
         </div>
     </div>
 </section>
 
-<!-- 2. 신뢰 & 서비스 메리트 바 (Value Proposition) -->
-<section class="value-prop-bar py-3 border-bottom bg-white">
-    <div class="container">
-        <div class="row g-3 text-center text-md-start">
-            <div class="col-md-3 col-6">
-                <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3 py-2 px-2">
-                    <div class="icon-circle"><i class="bi bi-box-seam"></i></div>
-                    <div>
-                        <div class="value-title font-sans fw-bold">무료 배송 &amp; 반품</div>
-                        <div class="value-desc text-muted extra-small">전 상품 3만원 이상 무료 배송</div>
-                    </div>
-                </div>
+<!-- 2. 무신사 실시간 랭킹 섹션 (Real-Time Goods Ranking) -->
+<section id="ranking" class="py-5 bg-white">
+    <div class="container-xl px-3">
+        <!-- 랭킹 섹션 헤더 (무신사 랭킹 타이틀) -->
+        <div class="ms-section-header">
+            <div class="d-flex align-items-baseline gap-2">
+                <h2 class="ms-section-title">실시간 랭킹</h2>
+                <span class="ms-section-sub">REAL-TIME RANKING</span>
             </div>
-            <div class="col-md-3 col-6">
-                <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3 py-2 px-2">
-                    <div class="icon-circle"><i class="bi bi-shield-check"></i></div>
-                    <div>
-                        <div class="value-title font-sans fw-bold">100% 정품 인증</div>
-                        <div class="value-desc text-muted extra-small">엄선된 패브릭과 품질 보증</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3 py-2 px-2">
-                    <div class="icon-circle"><i class="bi bi-gift"></i></div>
-                    <div>
-                        <div class="value-title font-sans fw-bold">첫 구매 15% 쿠폰</div>
-                        <div class="value-desc text-muted extra-small">신규 회원 가입 즉시 지급</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3 py-2 px-2">
-                    <div class="icon-circle"><i class="bi bi-chat-heart"></i></div>
-                    <div>
-                        <div class="value-title font-sans fw-bold">1:1 스타일링 컨설팅</div>
-                        <div class="value-desc text-muted extra-small">전문 큐레이터 실시간 상담</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- 3. 메인 큐레이션 상품 컬렉션 섹션 (Products Grid with Filter Tabs) -->
-<section id="products" class="py-5 bg-page">
-    <div class="container py-lg-4">
-        <!-- 섹션 헤더 (감각적인 에디토리얼 타이포) -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-end gap-3 mb-4">
-            <div>
-                <span class="section-eyebrow font-sans text-uppercase tracking-wider">SEASONAL ESSENTIALS</span>
-                <h2 class="section-title font-serif fw-bold mb-1">
-                    지금 가장 주목받는 시그니처 룩
-                </h2>
-                <p class="text-muted small mb-0 font-sans">
-                    엄선된 큐레이션으로 완성한 VIBE FASHION의 데일리 감성 아이템
-                </p>
-            </div>
-
-            <!-- 상품 총 개수 및 뷰 모드 정보 -->
-            <div class="text-muted small font-sans d-flex align-items-center gap-2">
-                <span class="badge bg-dark rounded-pill px-3 py-2">총 <strong id="productCount">{{ products|length }}</strong>개의 아이템</span>
+            <div class="d-flex align-items-center gap-3">
+                <span class="ms-live-timestamp d-none d-md-inline"><i class="bi bi-clock me-1"></i>2026.09.28 15:00 기준</span>
+                <a href="#ranking" class="text-dark extra-small fw-bold text-decoration-none">전체 랭킹 &gt;</a>
             </div>
         </div>
 
-        <!-- 카테고리 인터랙티브 필터 탭 -->
-        <div class="category-filter-wrapper mb-4 pb-2 d-flex gap-2 overflow-x-auto">
-            <button class="btn btn-filter-tab active" type="button" onclick="filterCategory('all', this)">
-                전체보기
+        <!-- 카테고리 필터 탭 (무신사 랭킹 카테고리 탭) -->
+        <div class="ms-filter-tabs">
+            <button type="button" class="ms-filter-pill active" onclick="filterCategory('all', this)">
+                전체
             </button>
-            <button class="btn btn-filter-tab" type="button" onclick="filterCategory('outer', this)">
+            <button type="button" class="ms-filter-pill" onclick="filterCategory('outer', this)">
                 아우터
             </button>
-            <button class="btn btn-filter-tab" type="button" onclick="filterCategory('top', this)">
+            <button type="button" class="ms-filter-pill" onclick="filterCategory('top', this)">
                 상의
             </button>
-            <button class="btn btn-filter-tab" type="button" onclick="filterCategory('bottom', this)">
-                하의
+            <button type="button" class="ms-filter-pill" onclick="filterCategory('bottom', this)">
+                바지
             </button>
-            <button class="btn btn-filter-tab" type="button" onclick="filterCategory('dress', this)">
-                원피스
+            <button type="button" class="ms-filter-pill" onclick="filterCategory('shoes', this)">
+                스니커즈
             </button>
-            <button class="btn btn-filter-tab" type="button" onclick="filterCategory('shoes', this)">
-                신발
+            <button type="button" class="ms-filter-pill" onclick="filterCategory('dress', this)">
+                원피스/세트
             </button>
         </div>
 
-        <!-- 상품 카드 리스트 그리드 -->
-        <div class="row g-4" id="productGrid">
+        <!-- 무신사 시그니처 상품 카드 그리드 (Desktop 6열, Tablet 3열, Mobile 2열 고밀도 그리드) -->
+        <div class="row g-3 g-md-4" id="productGrid">
             {% for product in products %}
-            <div class="col-xl-4 col-md-6 col-12 product-item-col" data-category="{{ product.category_slug }}">
-                <div class="card product-card-modern h-100 border-0 rounded-4 overflow-hidden position-relative">
-                    <!-- 상단 뱃지 영역 (할인율 or 신규) -->
-                    <div class="card-badges-wrapper position-absolute top-0 start-0 m-3 z-3 d-flex flex-column gap-1">
-                        {% if product.discount_rate %}
-                        <span class="badge badge-sale-pill font-sans fw-bold">
-                            {{ product.discount_rate }}% OFF
+            <div class="col-xl-2 col-lg-3 col-md-4 col-6 product-item-col" data-category="{{ product.category_slug }}">
+                <div class="ms-goods-card">
+                    <!-- 썸네일 박스 -->
+                    <div class="ms-thumb-box">
+                        <!-- 랭킹 순위 뱃지 (1~3위는 무신사 레드 뱃지) -->
+                        <span class="ms-rank-badge {% if loop.index <= 3 %}top-rank{% endif %}">
+                            {{ loop.index }}
                         </span>
-                        {% endif %}
-                        {% if loop.index <= 2 %}
-                        <span class="badge badge-new-pill font-sans fw-semibold">
-                            NEW
-                        </span>
-                        {% endif %}
+
+                        <!-- 위시리스트 좋아요 하트 버튼 -->
+                        <button type="button" 
+                                class="ms-btn-like" 
+                                title="좋아요"
+                                onclick="toggleWishlist(this, '{{ product.name }}')">
+                            <i class="bi bi-heart"></i>
+                        </button>
+
+                        <!-- 상품 이미지 -->
+                        <img src="{{ product.thumbnail_url }}" alt="{{ product.name }}" class="ms-thumb-img" loading="lazy">
+
+                        <!-- 호버 시 퀵 장바구니 담기 바 -->
+                        <button type="button" 
+                                class="ms-quick-cart-bar" 
+                                onclick="addToCart('{{ product.name }}', '{{ product.price }}', '{{ product.thumbnail_url }}')">
+                            <i class="bi bi-bag-plus me-1"></i> 바로 담기
+                        </button>
                     </div>
 
-                    <!-- 위시리스트 플로팅 버튼 -->
-                    <button class="btn btn-modern-wishlist position-absolute top-0 end-0 m-3 z-3" 
-                            type="button" 
-                            title="관심 상품 추가"
-                            onclick="toggleWishlist(this, '{{ product.name }}')">
-                        <i class="bi bi-heart"></i>
-                    </button>
+                    <!-- 상품 상세 정보 -->
+                    <div class="ms-goods-info">
+                        <!-- 브랜드명 (볼드 산세리프) -->
+                        <div class="ms-brand-name">{{ product.brand }}</div>
 
-                    <!-- 이미지 뷰어 박스 -->
-                    <div class="product-media-frame position-relative overflow-hidden">
-                        <img src="{{ product.thumbnail_url }}" class="product-cover-img" alt="{{ product.name }}" loading="lazy">
-                        <!-- 호버 시 등장하는 퀵 액션 오버레이 바 -->
-                        <div class="quick-action-overlay d-flex align-items-center justify-content-center p-3">
-                            <button class="btn btn-quick-cart w-100 py-2 rounded-pill font-sans fw-semibold shadow" 
-                                    type="button" 
-                                    onclick="addToCart('{{ product.name }}', '{{ product.price }}', '{{ product.thumbnail_url }}')">
-                                <i class="bi bi-bag-plus me-1"></i> 바로 담기
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- 상품 정보 바디 -->
-                    <div class="card-body p-4 d-flex flex-column">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="product-cat-label font-sans extra-small text-uppercase tracking-wider">
-                                {{ product.category }}
-                            </span>
-                            <span class="stock-status-pill extra-small"><i class="bi bi-check2 me-1"></i>당일 출고</span>
-                        </div>
-
-                        <h5 class="product-card-title font-serif fw-bold mb-2 text-truncate" title="{{ product.name }}">
+                        <!-- 상품명 -->
+                        <a href="javascript:void(0)" class="ms-goods-title" title="{{ product.name }}">
                             {{ product.name }}
-                        </h5>
+                        </a>
 
-                        <p class="product-card-desc text-muted small line-clamp-2 mb-3 flex-grow-1">
-                            {{ product.description }}
-                        </p>
+                        <!-- 태그 뱃지 -->
+                        <span class="ms-tag-badge">{{ product.tag }}</span>
 
                         <!-- 가격 영역 -->
-                        <div class="price-row d-flex align-items-baseline gap-2 pt-2 border-top border-light-subtle mt-auto">
-                            <span class="current-price font-sans fw-bolder fs-5 text-dark">
-                                {{ product.price }}
-                            </span>
+                        <div class="ms-price-box">
+                            <div>
+                                {% if product.discount_rate %}
+                                <span class="ms-discount-rate">{{ product.discount_rate }}%</span>
+                                {% endif %}
+                                <span class="ms-final-price">{{ product.price }}</span>
+                            </div>
                             {% if product.original_price %}
-                            <span class="original-price font-sans text-muted text-decoration-line-through small">
-                                {{ product.original_price }}
-                            </span>
+                            <div class="ms-orig-price">{{ product.original_price }}</div>
                             {% endif %}
+                        </div>
+
+                        <!-- 좋아요수 & 리뷰수 메타 정보 -->
+                        <div class="ms-meta-row">
+                            <span><i class="bi bi-heart-fill text-muted me-1"></i>{{ product.likes }}</span>
+                            <span>★ 4.9 ({{ product.reviews }})</span>
                         </div>
                     </div>
                 </div>
             </div>
             {% else %}
             <div class="col-12 text-center py-5">
-                <div class="empty-state-box py-5">
-                    <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
-                    <p class="text-muted font-sans">등록된 상품이 없습니다.</p>
-                </div>
+                <p class="text-muted font-sans">등록된 상품이 없습니다.</p>
             </div>
             {% endfor %}
         </div>
 
-        <!-- 검색/필터 결과 없음 상태 표시용 (JS 컨트롤) -->
+        <!-- 검색/필터 결과 없음 상태 표시용 -->
         <div id="noResultsState" class="text-center py-5 d-none">
             <i class="bi bi-search fs-1 text-muted mb-3 d-block"></i>
-            <h5 class="font-serif fw-bold text-dark">일치하는 상품이 없습니다</h5>
-            <p class="text-muted small font-sans">다른 카테고리나 검색어로 다시 시도해 보세요.</p>
-            <button class="btn btn-outline-dark rounded-pill px-4 mt-2" onclick="resetFilters()">전체 상품 보기</button>
+            <h5 class="fw-bold text-dark">검색 결과가 없습니다</h5>
+            <p class="text-muted small">다른 검색어나 카테고리를 선택해 보세요.</p>
+            <button class="btn btn-dark rounded-0 px-4 mt-2 extra-small fw-bold" onclick="resetFilters()">
+                전체 상품 보기
+            </button>
         </div>
     </div>
 </section>
 
-<!-- 4. 비주얼 에디토리얼 룩북 배너 (Editorial Moodboard) -->
-<section id="lookbook" class="editorial-banner-section py-5 bg-navy text-white position-relative overflow-hidden">
-    <div class="container py-lg-4">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6">
-                <span class="badge badge-subtle-gold mb-3 font-sans">EDITORIAL VIBE</span>
-                <h2 class="display-5 font-serif fw-bold mb-3">
-                    Everyday Sophistication<br>
-                    <span class="font-editorial text-gold">City Life, Gentle Mood</span>
-                </h2>
-                <p class="text-white-50 lead fs-6 font-sans mb-4 lh-lg">
-                    과장되지 않은 자연스러운 라인, 계절의 온도를 담은 텍스처.<br>
-                    어떤 TPO에서도 나만의 무드를 잃지 않는 VIBE 스타일링 팁을 확인하세요.
-                </p>
-                <div class="d-flex gap-3">
-                    <a href="#products" class="btn btn-gold px-4 py-3 font-sans fw-semibold">시즌 아이템 보기</a>
+<!-- 3. 무신사 스페셜 기획전 배너 섹션 (Special Exhibition) -->
+<section class="py-4 bg-light border-top border-bottom">
+    <div class="container-xl px-3">
+        <div class="row g-3">
+            <div class="col-md-6 col-12">
+                <div class="p-4 bg-dark text-white d-flex align-items-center justify-content-between position-relative overflow-hidden" style="min-height: 140px;">
+                    <div>
+                        <span class="badge bg-ms-red text-white extra-small mb-2">무신사 단독 기획전</span>
+                        <h4 class="fw-bold mb-1 font-sans">2026 간절기 아우터 페스티벌</h4>
+                        <p class="text-white-50 extra-small mb-0">워크자켓부터 코튼 오버핏까지 전 상품 최대 30% 쿠폰팩</p>
+                    </div>
+                    <i class="bi bi-arrow-right-circle fs-2 text-white-50"></i>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="lookbook-collage-grid">
-                    <div class="collage-item collage-main rounded-4 overflow-hidden shadow-lg">
-                        <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&auto=format&fit=crop&q=80" alt="Lookbook 1" class="img-fluid w-100 h-100 object-fit-cover">
+            <div class="col-md-6 col-12">
+                <div class="p-4 bg-white border text-dark d-flex align-items-center justify-content-between position-relative overflow-hidden" style="min-height: 140px;">
+                    <div>
+                        <span class="badge bg-dark text-white extra-small mb-2">스니커즈 랭킹</span>
+                        <h4 class="fw-bold mb-1 font-sans">컨버스 &amp; 클래식 슈즈 컬렉션</h4>
+                        <p class="text-muted extra-small mb-0">오리지널 척테일러 언얼스드 단독 입고 &amp; 무료 배송</p>
                     </div>
-                    <div class="collage-item collage-sub rounded-4 overflow-hidden shadow">
-                        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&auto=format&fit=crop&q=80" alt="Lookbook 2" class="img-fluid w-100 h-100 object-fit-cover">
-                    </div>
+                    <i class="bi bi-arrow-right-circle fs-2 text-dark"></i>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- 5. 토스트 알림창 (Toast Notification) -->
+<!-- 4. 무신사 토스트 알림창 (Toast Notification) -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
-    <div id="cartToast" class="toast align-items-center modern-toast border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="cartToast" class="toast align-items-center text-bg-dark border-0 rounded-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex p-2">
             <div class="toast-body d-flex align-items-center gap-3">
-                <div class="toast-icon-box bg-gold text-dark">
-                    <i class="bi bi-check-lg fs-5"></i>
-                </div>
+                <i class="bi bi-check-circle-fill text-ms-red fs-5"></i>
                 <div>
-                    <div class="fw-bold small font-sans text-white" id="toastTitle">쇼핑백에 추가되었습니다</div>
-                    <div class="text-white-50 extra-small font-sans" id="toastMessage">상품이 정상적으로 담겼습니다.</div>
+                    <div class="fw-bold small" id="toastTitle">장바구니에 담겼습니다</div>
+                    <div class="text-white-50 extra-small" id="toastMessage">상품이 정상적으로 추가되었습니다.</div>
                 </div>
             </div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="닫기"></button>
