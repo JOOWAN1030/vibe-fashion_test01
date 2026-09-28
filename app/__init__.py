@@ -29,7 +29,9 @@ def create_app():
     # 라우트(블루프린트) 등록
     from app.routes.main import main_bp
     from app.routes.auth import auth_bp
+    from app.routes.board import board_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(board_bp)
 
     return app

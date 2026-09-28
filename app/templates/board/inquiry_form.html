@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}문의 작성 - VIBE FASHION{% endblock %}
+
+{% block content %}
+<section class="auth-page-section py-5 d-flex align-items-center">
+    <div class="container py-md-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9 col-11">
+                <div class="auth-card p-4 p-md-5 rounded-4 shadow-lg border-0 bg-white">
+                    <!-- 헤더 영역 -->
+                    <div class="text-center mb-4">
+                        <span class="badge badge-subtle-gold font-sans fw-bold mb-2">1:1 CONSULTING</span>
+                        <h2 class="auth-title font-serif fw-bold mb-2">문의 작성하기</h2>
+                        <p class="text-muted small font-sans mb-0">상품 상세 스펙, 사이즈 상담, 출고 및 배송 문의를 남겨주세요.</p>
+                    </div>
+
+                    <!-- 플래시 메시지 -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show extra-small py-2 px-3 rounded-3" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close py-2 px-3" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('board.create_inquiry') }}" class="inquiry-form">
+                        <!-- 1. 문의 분류 선택 -->
+                        <div class="mb-4">
+                            <label class="form-label extra-small text-uppercase fw-bold text-muted font-sans mb-2">문의 유형 선택 *</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check custom-radio-box flex-fill p-3 border rounded-3">
+                                    <input class="form-check-input" type="radio" name="type" id="type_product" value="product" 
+                                           {% if preset_type == 'product' %}checked{% endif %} onchange="toggleProductSelect(true)">
+                                    <label class="form-check-label fw-bold font-sans small text-dark d-block" for="type_product">
+                                        <i class="bi bi-tag text-gold me-1"></i> 상품 문의
+                                        <span class="d-block extra-small text-muted fw-normal mt-1">사이즈, 실측, 소재, 재입고 일정 등</span>
+                                    </label>
+                                </div>
+                                <div class="form-check custom-radio-box flex-fill p-3 border rounded-3">
+                                    <input class="form-check-input" type="radio" name="type" id="type_shipping" value="shipping" 
+                                           {% if preset_type == 'shipping' %}checked{% endif %} onchange="toggleProductSelect(false)">
+                                    <label class="form-check-label fw-bold font-sans small text-dark d-block" for="type_shipping">
+                                        <i class="bi bi-truck text-gold me-1"></i> 배송 / 출고 문의
+                                        <span class="d-block extra-small text-muted fw-normal mt-1">출고일정, 배송지 변경, 안심반품 등</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. 대상 상품 선택 (상품 문의일 때 활성화) -->
+                        <div class="mb-3" id="productSelectWrapper">
+                            <label for="product_name" class="form-label extra-small text-uppercase fw-bold text-muted font-sans">문의 대상 상품</label>
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-bag"></i></span>
+                                <input type="text" class="form-control auth-input" id="product_name" name="product_name" 
+                                       value="{{ preset_product }}" placeholder="예: 컨스트럭션 아우터, 척테일러 올스타 언얼스드 등">
+                            </div>
+                        </div>
+
+                        <!-- 3. 작성자 정보 (비로그인 상태일 때) -->
+                        {% if not session.get('user') %}
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="author_name" class="form-label extra-small text-uppercase fw-bold text-muted font-sans">작성자 이름 *</label>
+                                <div class="input-group-modern">
+                                    <span class="input-icon"><i class="bi bi-person"></i></span>
+                                    <input type="text" class="form-control auth-input" id="author_name" name="author_name" placeholder="홍길동" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="author_email" class="form-label extra-small text-uppercase fw-bold text-muted font-sans">답변 수신 이메일</label>
+                                <div class="input-group-modern">
+                                    <span class="input-icon"><i class="bi bi-envelope"></i></span>
+                                    <input type="email" class="form-control auth-input" id="author_email" name="author_email" placeholder="example@vibe.com">
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="mb-3 p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+                            <div class="extra-small font-sans text-muted">
+                                작성자: <strong class="text-dark">{{ session['user']['name'] }}</strong> ({{ session['user']['email'] }})
+                            </div>
+                            <span class="badge bg-gold text-dark extra-small">회원 인증됨</span>
+                        </div>
+                        {% endif %}
+
+                        <!-- 4. 문의 제목 -->
+                        <div class="mb-3">
+                            <label for="title" class="form-label extra-small text-uppercase fw-bold text-muted font-sans">문의 제목 *</label>
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-chat-text"></i></span>
+                                <input type="text" class="form-control auth-input" id="title" name="title" placeholder="문의하실 내용을 간략히 요약해 주세요" required>
+                            </div>
+                        </div>
+
+                        <!-- 5. 문의 내용 -->
+                        <div class="mb-3">
+                            <label for="content" class="form-label extra-small text-uppercase fw-bold text-muted font-sans">문의 상세 내용 *</label>
+                            <textarea class="form-control rounded-3 p-3 font-sans small" id="content" name="content" rows="6" 
+                                      placeholder="구체적인 주문번호나 상품 사이즈, 배송 문의사항을 적어주시면 더욱 신속하고 정확한 답변이 가능합니다." required></textarea>
+                        </div>
+
+                        <!-- 6. 비밀글 설정 -->
+                        <div class="mb-4 p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="checkbox" id="is_secret" name="is_secret">
+                                <label class="form-check-label small fw-bold text-dark font-sans" for="is_secret">
+                                    <i class="bi bi-lock-fill text-muted me-1"></i> 비밀글로 등록
+                                </label>
+                                <div class="extra-small text-muted font-sans">체크 시 작성자와 관리자만 열람할 수 있습니다.</div>
+                            </div>
+                        </div>
+
+                        <!-- 전송 버튼 -->
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('board.list_inquiries') }}" class="btn btn-outline-secondary w-50 py-3 font-sans rounded-pill">
+                                취소
+                            </a>
+                            <button type="submit" class="btn btn-primary-luxury w-50 py-3 font-sans fw-bold rounded-pill">
+                                문의 등록하기
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function toggleProductSelect(isProduct) {
+    const wrap = document.getElementById('productSelectWrapper');
+    if (wrap) {
+        if (isProduct) {
+            wrap.style.display = 'block';
+        } else {
+            document.getElementById('product_name').value = '전체 배송 / 출고 문의';
+        }
+    }
+}
+</script>
+{% endblock %}

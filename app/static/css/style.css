@@ -924,6 +924,180 @@ body {
     box-shadow: 0 2px 8px rgba(12, 18, 30, 0.15);
 }
 
+/* ============================================================
+   13. 문의 게시판 스타일 (Inquiry Board System)
+   ============================================================ */
+.inquiry-hero {
+    background: linear-gradient(135deg, #0c121e 0%, #151d2f 100%);
+    position: relative;
+}
+
+.hero-ambient-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 30%, rgba(229, 179, 105, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.btn-inquiry-tab {
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.55rem 1.25rem;
+    border-radius: 50px;
+    border: 1px solid var(--color-border);
+    background: #ffffff;
+    color: var(--color-text-sub);
+    text-decoration: none;
+    transition: var(--transition-smooth);
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-inquiry-tab:hover {
+    background: #f8f9fa;
+    color: var(--color-navy);
+    border-color: #cfd4dc;
+}
+
+.btn-inquiry-tab.active {
+    background: var(--color-navy);
+    color: #ffffff;
+    border-color: var(--color-navy);
+    box-shadow: 0 4px 12px rgba(12, 18, 30, 0.15);
+}
+
+.btn-inquiry-tab .tab-badge {
+    background: #eaecf0;
+    color: #475467;
+    font-size: 0.72rem;
+    border-radius: 50px;
+    padding: 0.15rem 0.5rem;
+}
+
+.btn-inquiry-tab.active .tab-badge {
+    background: var(--color-gold);
+    color: var(--color-navy);
+}
+
+.search-inquiry-group {
+    min-width: 200px;
+}
+
+.inquiry-search-input {
+    padding-left: 2.6rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    border: 1px solid var(--color-border);
+}
+
+/* 아코디언 행 인터랙션 */
+.inquiry-row {
+    transition: background-color 0.2s ease;
+}
+
+.inquiry-summary {
+    cursor: pointer;
+    user-select: none;
+    transition: var(--transition-smooth);
+}
+
+.inquiry-summary:hover {
+    background-color: #fafbfc;
+}
+
+.inquiry-title-text {
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+}
+
+.inquiry-summary:hover .inquiry-title-text {
+    color: #c99343 !important;
+}
+
+.badge-inq-product {
+    background-color: #eff8ff;
+    color: #175cd3;
+    border: 1px solid #b2ddff;
+    font-size: 0.72rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+}
+
+.badge-inq-shipping {
+    background-color: #fdf2fa;
+    color: #c11574;
+    border: 1px solid #fccdbe;
+    font-size: 0.72rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+}
+
+.badge-status-answered {
+    background-color: #ecfdf3;
+    color: #027a48;
+    border: 1px solid #a6f4c5;
+    font-size: 0.72rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 50px;
+}
+
+.badge-status-pending {
+    background-color: #fffaeb;
+    color: #b54708;
+    border: 1px solid #fedf89;
+    font-size: 0.72rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 50px;
+}
+
+.q-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--color-navy);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.a-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--color-gold);
+    color: var(--color-navy);
+    font-weight: 800;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.admin-answer-box {
+    background-color: #ffffff;
+    border-left: 4px solid var(--color-gold) !important;
+}
+
+.custom-radio-box {
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.custom-radio-box:hover {
+    background-color: #f8f9fa;
+    border-color: var(--color-gold) !important;
+}
+
+.custom-radio-box input:checked + label {
+    color: var(--color-navy) !important;
+}
+
 /* [Script] 히어로 상단 필기체 감성 액센트 */
 .hero-script-accent {
     font-family: var(--font-script);

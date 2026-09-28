@@ -148,6 +148,25 @@ CREATE TABLE IF NOT EXISTS public.reviews (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
 );
 
+-- inquiries (1:1 상품문의 및 배송문의 게시판)
+CREATE TABLE IF NOT EXISTS public.inquiries (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+    product_id UUID REFERENCES public.products(id) ON DELETE SET NULL,
+    type TEXT NOT NULL CHECK (type IN ('product', 'shipping', 'other')),
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    author_name TEXT NOT NULL,
+    author_email TEXT,
+    is_secret BOOLEAN NOT NULL DEFAULT FALSE,
+    password TEXT,
+    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'answered')),
+    answer TEXT,
+    answered_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
 -- 3. 인덱스 생성
 CREATE INDEX IF NOT EXISTS idx_products_category ON public.products(category_id);
 CREATE INDEX IF NOT EXISTS idx_product_options_product ON public.product_options(product_id);
@@ -158,6 +177,9 @@ CREATE INDEX IF NOT EXISTS idx_orders_status ON public.orders(status);
 CREATE INDEX IF NOT EXISTS idx_order_items_order ON public.order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_reviews_product ON public.reviews(product_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON public.notifications(user_id, is_read);
+CREATE INDEX IF NOT EXISTS idx_inquiries_type ON public.inquiries(type);
+CREATE INDEX IF NOT EXISTS idx_inquiries_product ON public.inquiries(product_id);
+CREATE INDEX IF NOT EXISTS idx_inquiries_status ON public.inquiries(status);
 
 -- 4. 신규 유저 생성(소셜/이메일) 시 자동 프로필 등록 함수 및 트리거
 CREATE OR REPLACE FUNCTION public.handle_new_user()

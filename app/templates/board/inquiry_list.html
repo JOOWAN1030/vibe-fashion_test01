@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}고객 문의 센터 - VIBE FASHION{% endblock %}
+
+{% block content %}
+<!-- 문의 센터 히어로 배너 -->
+<section class="inquiry-hero py-5 bg-navy text-white text-center position-relative overflow-hidden">
+    <div class="hero-ambient-glow"></div>
+    <div class="container position-relative z-2 py-4">
+        <span class="badge badge-subtle-gold font-sans fw-bold mb-3">CUSTOMER CARE ATELIER</span>
+        <h1 class="font-serif fw-bold display-5 mb-3">Q&amp;A 및 문의 센터</h1>
+        <p class="text-white-50 font-sans lead fs-6 mx-auto mb-4" style="max-width: 620px;">
+            상품 스펙, 사이즈 핏, 실시간 출고 및 배송 등 궁금하신 점을 남겨주시면<br class="d-none d-sm-inline">
+            VIBE 전담 패션 큐레이터가 가장 빠르고 친절하게 답변드립니다.
+        </p>
+
+        <!-- 퀵 FAQ 바로가기 뱃지 -->
+        <div class="d-flex flex-wrap justify-content-center gap-2">
+            <span class="badge bg-white bg-opacity-10 text-white-75 font-sans px-3 py-2 rounded-pill"><i class="bi bi-clock me-1 text-gold"></i>평일 10:00 - 18:00 운영</span>
+            <span class="badge bg-white bg-opacity-10 text-white-75 font-sans px-3 py-2 rounded-pill"><i class="bi bi-truck me-1 text-gold"></i>오후 2시 이전 주문 당일 출고</span>
+            <span class="badge bg-white bg-opacity-10 text-white-75 font-sans px-3 py-2 rounded-pill"><i class="bi bi-shield-check me-1 text-gold"></i>전 상품 100% 무료 반품</span>
+        </div>
+    </div>
+</section>
+
+<!-- 메인 문의 리스트 섹션 -->
+<section class="py-5 bg-page">
+    <div class="container">
+        <!-- 상단 플래시 메시지 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show extra-small py-3 px-4 rounded-3 shadow-sm mb-4" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+                        <button type="button" class="btn-close py-3 px-3" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- 카테고리 탭 & 글작성 버튼 헤더 -->
+        <div class="card border-0 rounded-4 shadow-sm p-4 bg-white mb-4">
+            <div class="row align-items-center g-3">
+                <!-- 탭 버튼 (전체 / 상품문의 / 배송문의) -->
+                <div class="col-lg-7 col-md-12">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('board.list_inquiries', type='all') }}" 
+                           class="btn btn-inquiry-tab {% if current_type == 'all' %}active{% endif %}">
+                            전체 문의 <span class="badge tab-badge ms-1">{{ counts.all }}</span>
+                        </a>
+                        <a href="{{ url_for('board.list_inquiries', type='product') }}" 
+                           class="btn btn-inquiry-tab {% if current_type == 'product' %}active{% endif %}">
+                            <i class="bi bi-tag me-1"></i> 상품 문의 <span class="badge tab-badge ms-1">{{ counts.product }}</span>
+                        </a>
+                        <a href="{{ url_for('board.list_inquiries', type='shipping') }}" 
+                           class="btn btn-inquiry-tab {% if current_type == 'shipping' %}active{% endif %}">
+                            <i class="bi bi-truck me-1"></i> 배송/출고 문의 <span class="badge tab-badge ms-1">{{ counts.shipping }}</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 검색창 및 문의작성 CTA -->
+                <div class="col-lg-5 col-md-12 d-flex justify-content-lg-end gap-2">
+                    <form method="GET" action="{{ url_for('board.list_inquiries') }}" class="d-flex gap-2 flex-grow-1 flex-lg-grow-0">
+                        <input type="hidden" name="type" value="{{ current_type }}">
+                        <div class="input-group-modern search-inquiry-group">
+                            <span class="input-icon"><i class="bi bi-search"></i></span>
+                            <input type="text" name="q" value="{{ search_query }}" class="form-control inquiry-search-input" placeholder="문의 내용 또는 상품명 검색...">
+                        </div>
+                    </form>
+                    <a href="{{ url_for('board.create_inquiry', type=current_type if current_type != 'all' else 'product') }}" 
+                       class="btn btn-primary-luxury px-3 px-sm-4 rounded-pill font-sans fw-bold d-inline-flex align-items-center gap-2 text-nowrap">
+                        <i class="bi bi-pencil-square"></i>
+                        <span>문의 작성하기</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 아코디언형 모던 Q&A 리스트 -->
+        <div class="inquiry-board-container card border-0 rounded-4 shadow-sm overflow-hidden bg-white">
+            <!-- 리스트 테이블 헤더 (데스크탑용) -->
+            <div class="inquiry-table-header d-none d-md-flex align-items-center px-4 py-3 border-bottom bg-light text-muted extra-small fw-bold font-sans">
+                <div style="width: 100px;">유형</div>
+                <div style="width: 160px;">대상 상품/분류</div>
+                <div class="flex-grow-1">제목</div>
+                <div style="width: 100px;" class="text-center">작성자</div>
+                <div style="width: 100px;" class="text-center">작성일</div>
+                <div style="width: 110px;" class="text-center">처리 상태</div>
+            </div>
+
+            <!-- 문의 항목 목록 -->
+            <div class="inquiry-item-list">
+                {% for item in inquiries %}
+                <div class="inquiry-row border-bottom" id="heading-{{ loop.index }}">
+                    <!-- 요약 바 (클릭 시 아코디언 토글) -->
+                    <div class="inquiry-summary d-flex flex-column flex-md-row align-items-start align-items-md-center px-4 py-3 gap-2 gap-md-0"
+                         data-bs-toggle="collapse" 
+                         data-bs-target="#collapse-{{ loop.index }}" 
+                         aria-expanded="false" 
+                         aria-controls="collapse-{{ loop.index }}">
+                        
+                        <!-- 유형 뱃지 -->
+                        <div style="width: 100px;" class="mb-1 mb-md-0">
+                            {% if item.type == 'product' %}
+                            <span class="badge badge-inq-product font-sans">상품문의</span>
+                            {% else %}
+                            <span class="badge badge-inq-shipping font-sans">배송문의</span>
+                            {% endif %}
+                        </div>
+
+                        <!-- 상품명 -->
+                        <div style="width: 160px;" class="text-muted small font-sans text-truncate pe-2">
+                            <i class="bi bi-bag-check me-1 d-md-none text-muted"></i>{{ item.product_name }}
+                        </div>
+
+                        <!-- 제목 & 비밀글 아이콘 -->
+                        <div class="flex-grow-1 inquiry-title-col">
+                            <span class="font-sans fw-semibold text-dark inquiry-title-text">
+                                {% if item.is_secret %}
+                                <i class="bi bi-lock-fill text-muted me-1"></i>
+                                {% endif %}
+                                {{ item.title }}
+                            </span>
+                        </div>
+
+                        <!-- 작성자 -->
+                        <div style="width: 100px;" class="text-center text-muted extra-small font-sans">
+                            {{ item.author_name }}
+                        </div>
+
+                        <!-- 작성일 -->
+                        <div style="width: 100px;" class="text-center text-muted extra-small font-sans">
+                            {{ item.created_at[:10] }}
+                        </div>
+
+                        <!-- 상태 뱃지 -->
+                        <div style="width: 110px;" class="text-center">
+                            {% if item.status == 'answered' %}
+                            <span class="badge badge-status-answered font-sans">
+                                <i class="bi bi-check2-circle me-1"></i>답변완료
+                            </span>
+                            {% else %}
+                            <span class="badge badge-status-pending font-sans">
+                                <i class="bi bi-hourglass-split me-1"></i>답변대기
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- 상세 내용 및 답변 영역 (Collapse) -->
+                    <div id="collapse-{{ loop.index }}" class="collapse inquiry-collapse-body" aria-labelledby="heading-{{ loop.index }}">
+                        <div class="p-4 bg-light-subtle border-top">
+                            <!-- 질문 본문 박스 -->
+                            <div class="customer-question-box bg-white p-4 rounded-3 shadow-sm border mb-3">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="q-circle">Q</span>
+                                    <h6 class="fw-bold mb-0 text-dark font-sans">{{ item.title }}</h6>
+                                </div>
+                                <div class="text-muted extra-small font-sans mb-3 ps-4">
+                                    상품/분류: <strong class="text-dark">{{ item.product_name }}</strong> | 작성일: {{ item.created_at }}
+                                </div>
+                                <p class="text-dark font-sans small mb-0 ps-4 lh-lg" style="white-space: pre-line;">
+                                    {{ item.content }}
+                                </p>
+                            </div>
+
+                            <!-- 답변 박스 -->
+                            {% if item.status == 'answered' and item.answer %}
+                            <div class="admin-answer-box p-4 rounded-3 border">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="a-circle">A</span>
+                                    <h6 class="fw-bold mb-0 text-dark font-sans">VIBE FASHION 전담팀 답변</h6>
+                                    <span class="text-muted extra-small ms-auto font-sans">{{ item.answered_at or '답변완료' }}</span>
+                                </div>
+                                <p class="text-dark font-sans small mb-0 ps-4 lh-lg" style="white-space: pre-line;">
+                                    {{ item.answer }}
+                                </p>
+                            </div>
+                            {% else %}
+                            <div class="admin-waiting-box p-3 rounded-3 border border-dashed text-center text-muted font-sans extra-small">
+                                <i class="bi bi-clock-history me-1"></i> 담당 큐레이터가 문의 내용을 확인하고 있습니다. 빠른 시간 내에 답변드리겠습니다.
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-chat-square-dots fs-1 text-muted mb-3 d-block"></i>
+                    <h5 class="font-serif fw-bold text-dark">등록된 문의글이 없습니다</h5>
+                    <p class="text-muted small font-sans">궁금한 점이 있으시다면 언제든 편하게 문의를 남겨주세요.</p>
+                    <a href="{{ url_for('board.create_inquiry') }}" class="btn btn-outline-dark rounded-pill px-4 mt-2">
+                        첫 번째 문의 남기기
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 하단 고객지원 안내 카드 -->
+        <div class="mt-4 p-4 rounded-4 bg-white border shadow-sm">
+            <div class="row align-items-center g-3">
+                <div class="col-md-8">
+                    <h6 class="fw-bold font-serif mb-1 text-dark"><i class="bi bi-headset text-gold me-2"></i>실시간 유선 상담이 필요하신가요?</h6>
+                    <p class="text-muted small font-sans mb-0">고객센터 <strong>1588-0000</strong> (평일 10:00 ~ 18:00, 점심시간 12:30 ~ 13:30 제외)</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="{{ url_for('board.create_inquiry') }}" class="btn btn-dark rounded-pill px-4 font-sans small fw-semibold">
+                        1:1 문의 접수
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -50,23 +50,16 @@
                             <a class="nav-link active" href="{{ url_for('main.index') }}">홈</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#products">신상품</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#products">베스트</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#lookbook">룩북</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#curation">에디토리얼</a>
-                        </li>
-                    </ul>
-
-                    <!-- 헤더 우측 유틸리티 액션 버튼 (검색, 찜, 장바구니, 로그인/계정) -->
-                    <div class="d-flex align-items-center gap-2 pt-2 pt-lg-0">
-                        <div class="header-search-box d-none d-xl-flex align-items-center">
-                            <i class="bi bi-search text-muted me-2"></i>
+                                <a class="nav-link" href="{{ url_for('main.index') }}#products">신상품</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('main.index') }}#products">베스트</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('board.list_inquiries', type='product') }}">상품문의</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('board.list_inquiries', type='shipping') }}">배송문의</a>
                             <input type="text" id="searchInput" class="search-input" placeholder="스타일 또는 아이템 검색..." oninput="handleSearch(this.value)">
                         </div>
 
@@ -150,10 +143,10 @@
                 <div class="col-lg-2 col-md-3 col-6">
                     <h6 class="footer-section-title">SERVICE</h6>
                     <ul class="list-unstyled footer-menu-list">
-                        <li><a href="#">주문 / 배송 조회</a></li>
-                        <li><a href="#">교환 및 반품 접수</a></li>
+                        <li><a href="{{ url_for('board.list_inquiries', type='shipping') }}">주문 / 배송 조회</a></li>
+                        <li><a href="{{ url_for('board.list_inquiries', type='product') }}">상품 Q&amp;A 게시판</a></li>
+                        <li><a href="{{ url_for('board.create_inquiry') }}">1:1 문의 접수</a></li>
                         <li><a href="#">멤버십 등급 안내</a></li>
-                        <li><a href="#">기프트 카드</a></li>
                     </ul>
                 </div>
 
