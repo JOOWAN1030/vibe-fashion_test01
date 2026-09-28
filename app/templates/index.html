@@ -69,10 +69,10 @@
             </button>
         </div>
 
-        <!-- 상품 카드 그리드 -->
-        <div class="row g-3 g-md-4" id="productGrid">
+        <!-- 상품 카드 그리드 (Desktop 3열, Tablet 2열, Mobile 2열로 쾌적한 비례감 확보) -->
+        <div class="row g-3 g-md-4 row-cols-2 row-cols-md-3 row-cols-lg-3 row-cols-xl-3" id="productGrid">
             {% for product in products %}
-            <div class="col-xl-2 col-lg-3 col-md-4 col-6 product-item-col" data-category="{{ product.category_slug }}">
+            <div class="col product-item-col" data-category="{{ product.category_slug }}">
                 <div class="ms-goods-card">
                     <!-- 썸네일 박스 -->
                     <div class="ms-thumb-box">
@@ -89,8 +89,10 @@
                             <i class="bi bi-heart"></i>
                         </button>
 
-                        <!-- 상품 이미지 -->
-                        <img src="{{ product.thumbnail_url }}" alt="{{ product.name }}" class="ms-thumb-img" loading="lazy">
+                        <!-- 상품 이미지 (안정적인 프레임 센터링) -->
+                        <div class="ms-img-wrapper">
+                            <img src="{{ product.thumbnail_url }}" alt="{{ product.name }}" class="ms-thumb-img" loading="lazy">
+                        </div>
 
                         <!-- 호버 시 퀵 장바구니 담기 바 -->
                         <button type="button" 
@@ -100,22 +102,23 @@
                         </button>
                     </div>
 
-                    <!-- 상품 상세 정보 -->
+                    <!-- 상품 상세 정보 (균형 잡힌 타이포그래피 & 여백) -->
                     <div class="ms-goods-info">
-                        <!-- 브랜드명 (볼드 산세리프) -->
-                        <div class="ms-brand-name">{{ product.brand }}</div>
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <!-- 브랜드명 (볼드 산세리프) -->
+                            <div class="ms-brand-name mb-0">{{ product.brand }}</div>
+                            <!-- 태그 뱃지 -->
+                            <span class="ms-tag-badge mb-0">{{ product.tag }}</span>
+                        </div>
 
-                        <!-- 상품명 -->
+                        <!-- 상품명 (충분한 높이와 가독성 있는 폰트 사이즈) -->
                         <a href="javascript:void(0)" class="ms-goods-title" title="{{ product.name }}">
                             {{ product.name }}
                         </a>
 
-                        <!-- 태그 뱃지 -->
-                        <span class="ms-tag-badge">{{ product.tag }}</span>
-
                         <!-- 가격 영역 -->
                         <div class="ms-price-box">
-                            <div>
+                            <div class="d-flex align-items-baseline">
                                 {% if product.discount_rate %}
                                 <span class="ms-discount-rate">{{ product.discount_rate }}%</span>
                                 {% endif %}
