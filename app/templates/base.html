@@ -9,22 +9,22 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- Bootstrap Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Google Fonts: 무신사 모던 산세리프 폰트 체계 -->
+    <!-- Google Fonts: 모던 볼드 산세리프 폰트 체계 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- 무신사 테마 스타일 시트 -->
+    <!-- 커스텀 스타일 시트 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body class="d-flex flex-column min-vh-100 bg-white">
 
-    <!-- 1. 무신사 상단 서비스 탭 & 유틸리티 바 (Top Bar) -->
+    <!-- 1. 상단 서비스 탭 & 유틸리티 바 (Top Bar) -->
     <div class="ms-top-bar d-none d-md-block">
         <div class="container-xl d-flex justify-content-between align-items-center h-100 px-3">
             <!-- 좌측 서비스 패밀리 탭 -->
             <div class="d-flex align-items-center">
-                <a href="{{ url_for('main.index') }}" class="ms-service-tab active">무신사 스토어</a>
-                <a href="#" class="ms-service-tab">무신사 뷰티</a>
+                <a href="{{ url_for('main.index') }}" class="ms-service-tab active">VIBE 스토어</a>
+                <a href="#" class="ms-service-tab">VIBE 뷰티</a>
                 <a href="#" class="ms-service-tab">플레이어</a>
                 <a href="#" class="ms-service-tab">아울렛</a>
                 <a href="#" class="ms-service-tab">스냅</a>
@@ -57,14 +57,14 @@
         </div>
     </div>
 
-    <!-- 2. 무신사 메인 헤더 (로고, 캡슐 검색창, 유틸리티 아이콘) -->
+    <!-- 2. 메인 헤더 (로고, 캡슐 검색창, 유틸리티 아이콘) -->
     <header class="ms-main-header border-bottom">
         <div class="container-xl px-3">
             <div class="d-flex align-items-center justify-content-between gap-3">
-                <!-- 무신사 볼드 로고 -->
+                <!-- 브랜드 볼드 로고 -->
                 <a href="{{ url_for('main.index') }}" class="ms-logo text-decoration-none">
-                    MUSINSA
-                    <span class="ms-logo-tag">VIBE</span>
+                    VIBE
+                    <span class="ms-logo-tag">STORE</span>
                 </a>
 
                 <!-- 중앙 캡슐형 통합 검색창 -->
@@ -122,7 +122,7 @@
         </div>
     </header>
 
-    <!-- 3. 무신사 GNB 네비게이션 바 (Sticky GNB) -->
+    <!-- 3. GNB 네비게이션 바 (Sticky GNB) -->
     <nav class="ms-gnb-bar">
         <div class="container-xl px-3">
             <ul class="ms-gnb-menu">
@@ -159,7 +159,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- 4. 무신사 시그니처 하이덴시티 모노크롬 푸터 -->
+    <!-- 4. 하이덴시티 모노크롬 푸터 -->
     <footer class="ms-footer">
         <div class="container-xl px-3">
             <!-- 상단 이용 메뉴 -->
@@ -177,7 +177,7 @@
             <div class="row g-4">
                 <!-- 고객센터 정보 -->
                 <div class="col-lg-4 col-md-6">
-                    <div class="text-dark fw-bold mb-1">무신사 VIBE 고객센터</div>
+                    <div class="text-dark fw-bold mb-1">VIBE FASHION 고객센터</div>
                     <div class="ms-cs-number">1544-7199</div>
                     <p class="mb-2 text-muted extra-small">
                         운영시간: 평일 09:00 ~ 18:00 (토, 일, 공휴일 휴무)<br>
@@ -195,11 +195,11 @@
 
                 <!-- 사업자 및 에스크로 정보 -->
                 <div class="col-lg-5 col-md-6 ms-footer-company-info">
-                    <p class="mb-1 fw-bold text-dark">(주)무신사 VIBE 스토어</p>
+                    <p class="mb-1 fw-bold text-dark">(주)바이브스토어</p>
                     <p class="mb-0">
-                        대표이사: 조만호, 한문일 | 서울특별시 성동구 아차산로 13길 11 무신사 캠퍼스<br>
+                        대표이사: 조만호, 한문일 | 서울특별시 성동구 아차산로 13길 11 VIBE 캠퍼스<br>
                         사업자등록번호: 211-88-40000 | 통신판매업신고: 2026-서울성동-0000<br>
-                        호스팅서비스: Microsoft Azure Web Apps | 이메일: cs@musinsa-vibe.com
+                        호스팅서비스: Microsoft Azure Web Apps | 이메일: cs@vibe-store.com
                     </p>
                     <p class="mt-2 text-muted extra-small mb-0">
                         KG이니시스 구매안전(에스크로) 서비스: 고객님의 안전거래를 위해 현금 등으로 결제 시 결제금액 전액에 대해 안전 결제를 보장합니다.
@@ -214,7 +214,7 @@
                         <a href="#" title="Facebook"><i class="bi bi-facebook"></i></a>
                     </div>
                     <div class="text-muted extra-small">
-                        &copy; 2026 MUSINSA VIBE Co., Ltd. All rights reserved.
+                        &copy; 2026 VIBE STORE Co., Ltd. All rights reserved.
                     </div>
                 </div>
             </div>
