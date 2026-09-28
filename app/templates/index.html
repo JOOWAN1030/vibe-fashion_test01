@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}VIBE FASHION - 감각적인 스타일의 시작{% endblock %}
+
+{% block content %}
+<!-- 1. 히어로 섹션 (Hero Section) -->
+<section class="hero-section text-white text-center d-flex align-items-center justify-content-center">
+    <div class="hero-overlay"></div>
+    <div class="container position-relative z-1 py-5">
+        <!-- Script 폰트: 감각적인 부티크 무드의 필기체 액센트 -->
+        <p class="hero-script-accent font-script mb-2">Elegance in Every Detail</p>
+        
+        <!-- Slab Serif 폰트: 볼드하고 현대적인 시즌 뱃지 -->
+        <span class="badge hero-badge font-slab px-3 py-2 text-uppercase mb-3 tracking-wide">
+            2026 S/S NEW COLLECTION
+        </span>
+        
+        <!-- Serif 폰트: 클래식하고 럭셔리한 에디토리얼 메인 타이틀 -->
+        <h1 class="display-3 fw-bolder mb-3 hero-title font-serif">
+            당신의 일상을 스타일리시하게
+        </h1>
+        
+        <!-- Sans Serif 폰트: 높은 가독성의 본문 설명 -->
+        <p class="lead mx-auto mb-4 text-light text-opacity-75 hero-desc font-sans" style="max-width: 650px;">
+            일상의 순간을 특별하게 만드는 프리미엄 데일리 룩.<br class="d-none d-md-inline">
+            지금 가장 트렌디한 VIBE FASHION의 에센셜 아이템을 만나보세요.
+        </p>
+        
+        <!-- Sans Serif 폰트: 깔끔하고 직관적인 CTA 버튼 -->
+        <div class="d-flex justify-content-center gap-3">
+            <a href="#products" class="btn btn-warning btn-lg px-4 fw-bold shadow-sm font-sans btn-hero-cta">
+                지금 쇼핑하기 <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+            <a href="#features" class="btn btn-outline-light btn-lg px-4 fw-medium font-sans">
+                브랜드 스토리
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- 2. 브랜드 특징 뱃지 영역 -->
+<section id="features" class="py-4 bg-white border-bottom shadow-sm">
+    <div class="container">
+        <div class="row text-center g-3">
+            <div class="col-md-4 d-flex align-items-center justify-content-center gap-3 py-2">
+                <i class="bi bi-truck fs-2 text-warning"></i>
+                <div class="text-start">
+                    <h6 class="mb-0 fw-bold font-slab feature-title">전 상품 무료 배송</h6>
+                    <small class="text-muted font-sans">3만원 이상 구매 시 전 지역 무료</small>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-center justify-content-center gap-3 py-2">
+                <i class="bi bi-patch-check fs-2 text-warning"></i>
+                <div class="text-start">
+                    <h6 class="mb-0 fw-bold font-slab feature-title">100% 프리미엄 퀄리티</h6>
+                    <small class="text-muted font-sans">엄선된 원단과 정교한 마감</small>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-center justify-content-center gap-3 py-2">
+                <i class="bi bi-arrow-repeat fs-2 text-warning"></i>
+                <div class="text-start">
+                    <h6 class="mb-0 fw-bold font-slab feature-title">안심 교환 / 반품</h6>
+                    <small class="text-muted font-sans">수령 후 7일 이내 간편 반품</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3. 더미 상품 카드 4개 섹션 (Product Cards) -->
+<section id="products" class="py-5">
+    <div class="container">
+        <!-- 섹션 헤더 -->
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <!-- Script 폰트 감성 서브 태그 -->
+                <div class="section-script-accent font-script">Curated by Stylists</div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <!-- Slab Serif 폰트 핫픽 뱃지 -->
+                    <span class="badge section-kicker font-slab">HOT PICKS</span>
+                </div>
+                <!-- Serif 폰트 품격 있는 섹션 헤딩 -->
+                <h2 class="fw-bold mb-0 font-serif section-heading">주목해야 할 베스트 아이템</h2>
+            </div>
+            <a href="#" class="text-decoration-none text-dark fw-medium small font-sans see-all-link">
+                전체보기 <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+
+        <!-- 상품 카드 그리드 -->
+        <div class="row g-4">
+            {% for product in products %}
+            <div class="col-xl-3 col-lg-3 col-md-6 col-12">
+                <div class="card h-100 product-card border-0 shadow-sm rounded-3 overflow-hidden">
+                    <!-- 상품 이미지 -->
+                    <div class="position-relative overflow-hidden product-img-box">
+                        <img src="{{ product.thumbnail_url }}" class="card-img-top product-img" alt="{{ product.name }}">
+                        <!-- 위시리스트 버튼 -->
+                        <button class="btn btn-light rounded-circle position-absolute top-0 end-0 m-3 shadow-sm btn-wishlist" 
+                                type="button" 
+                                title="관심 상품 추가"
+                                onclick="toggleWishlist(this)">
+                            <i class="bi bi-heart text-danger"></i>
+                        </button>
+                    </div>
+
+                    <!-- 상품 정보 본문 -->
+                    <div class="card-body d-flex flex-column p-4">
+                        {% if product.category %}
+                        <!-- Slab Serif 폰트 카테고리 태그 -->
+                        <div class="small text-muted text-uppercase mb-1 fw-bold tracking-wider font-slab product-category">
+                            {{ product.category }}
+                        </div>
+                        {% endif %}
+                        <!-- Serif 폰트 감각적인 상품명 -->
+                        <h5 class="card-title fw-bold fs-6 mb-2 text-truncate font-serif product-title" title="{{ product.name }}">
+                            {{ product.name }}
+                        </h5>
+                        {% if product.description %}
+                        <!-- Sans Serif 폰트 가독성 높은 설명 -->
+                        <p class="card-text text-muted small mb-3 flex-grow-1 font-sans product-desc">
+                            {{ product.description }}
+                        </p>
+                        {% endif %}
+                        
+                        <!-- 가격(Sans Serif) 및 장바구니 담기 버튼 -->
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-auto">
+                            <div>
+                                <span class="fs-5 fw-bold text-dark font-sans product-price">
+                                    {{ product.price }}
+                                </span>
+                            </div>
+                            <button class="btn btn-dark btn-sm px-3 rounded-pill font-sans btn-add-cart" 
+                                    type="button" 
+                                    onclick="addToCart('{{ product.name }}')">
+                                <i class="bi bi-bag-plus me-1"></i> 담기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted mb-0 font-sans">등록된 추천 상품이 없습니다.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- 4. 토스트 알림창 (장바구니 담기 성공 시 노출) -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
+    <div id="cartToast" class="toast align-items-center text-bg-dark border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-warning fs-5"></i>
+                <span id="toastMessage">장바구니에 상품이 담겼습니다.</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="닫기"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}

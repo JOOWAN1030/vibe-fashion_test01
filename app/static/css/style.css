@@ -1,0 +1,464 @@
+/* app/static/css/style.css - VIBE FASHION 커스텀 스타일 */
+
+/* ============================================================
+   1. 구글 폰트 임포트: 4대 타이포그래피 시스템
+   - Serif: Playfair Display + Noto Serif KR
+   - Sans Serif: Montserrat + Noto Sans KR
+   - Slab Serif: Roboto Slab
+   - Script (Handwritten): Alex Brush
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&family=Montserrat:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Roboto+Slab:wght@400;500;600;700;800&display=swap');
+
+/* ============================================================
+   2. 디자인 토큰 및 폰트 패밀리 변수
+   ============================================================ */
+:root {
+    /* 폰트 종류별 체계 */
+    --font-serif: 'Playfair Display', 'Noto Serif KR', Georgia, serif;
+    --font-sans: 'Montserrat', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-slab: 'Roboto Slab', 'Noto Serif KR', Georgia, serif;
+    --font-script: 'Alex Brush', cursive;
+
+    /* Young Fit 브랜드 톤 컬러 */
+    --brand-navy: #1a2a4a;        /* 기본 딥 네이비 */
+    --brand-navy-dark: #0f1a2e;   /* 히어로/푸터 딥 네이비 */
+    --brand-black: #000000;       /* 포인트 블랙 */
+    --brand-coral: #ff6b5b;       /* 코랄 포인트 액센트 */
+    --brand-coral-hover: #e85545; /* 코랄 호버 색상 */
+    --brand-coral-light: rgba(255, 107, 91, 0.12);
+    --brand-bg: #f8f9fa;          /* 페이지 배경색 */
+}
+
+/* ============================================================
+   3. 타이포그래피 유틸리티 클래스
+   ============================================================ */
+.font-serif {
+    font-family: var(--font-serif) !important;
+}
+
+.font-sans {
+    font-family: var(--font-sans) !important;
+}
+
+.font-slab {
+    font-family: var(--font-slab) !important;
+}
+
+.font-script {
+    font-family: var(--font-script) !important;
+}
+
+/* ============================================================
+   4. 기본 글로벌 스타일
+   ============================================================ */
+body {
+    font-family: var(--font-sans);
+    color: #2b2f33;
+    background-color: var(--brand-bg);
+    line-height: 1.6;
+    letter-spacing: -0.2px;
+}
+
+/* ============================================================
+   5. 네비게이션 바 & 로고
+   ============================================================ */
+.navbar.bg-dark {
+    background-color: var(--brand-navy) !important;
+}
+
+.navbar-brand {
+    font-family: var(--font-serif);
+    letter-spacing: 1.5px;
+    font-weight: 700;
+}
+
+.navbar-brand i.text-warning {
+    color: var(--brand-coral) !important;
+}
+
+/* 로고 옆 감각적인 Script 폰트 태그 */
+.logo-script-accent {
+    font-family: var(--font-script);
+    font-size: 1.65rem;
+    font-weight: 400;
+    color: var(--brand-coral) !important;
+    letter-spacing: 0.5px;
+    margin-left: 2px;
+}
+
+.navbar-nav .nav-link {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: color 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--brand-coral) !important;
+}
+
+/* ============================================================
+   6. 히어로 섹션
+   ============================================================ */
+.hero-section {
+    position: relative;
+    min-height: 540px;
+    background: linear-gradient(180deg, var(--brand-navy) 0%, #0e1726 60%, var(--brand-black) 100%);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    padding: 85px 0 75px;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 35%, rgba(255, 107, 91, 0.18) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* [Script] 히어로 상단 필기체 감성 액센트 */
+.hero-script-accent {
+    font-family: var(--font-script);
+    font-size: 2.35rem;
+    color: var(--brand-coral);
+    letter-spacing: 1px;
+    line-height: 1.2;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+/* [Slab Serif] 히어로 시즌 뱃지 */
+.hero-badge.font-slab {
+    font-family: var(--font-slab);
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    background-color: var(--brand-coral-light) !important;
+    color: var(--brand-coral) !important;
+    border: 1px solid rgba(255, 107, 91, 0.45);
+    border-radius: 4px;
+    padding: 0.45rem 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* [Serif] 히어로 메인 타이틀 */
+.hero-title.font-serif {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 3rem;
+    line-height: 1.25;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    margin-bottom: 1.2rem;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* [Sans Serif] 히어로 설명문 */
+.hero-desc.font-sans {
+    font-family: var(--font-sans);
+    font-size: 1.05rem;
+    line-height: 1.75;
+    font-weight: 400;
+    text-align: center;
+}
+
+/* [Sans Serif] 히어로 CTA 버튼 */
+.btn-hero-cta,
+.hero-section .btn-warning {
+    font-family: var(--font-sans);
+    background-color: var(--brand-coral) !important;
+    border-color: var(--brand-coral) !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.3px;
+    transition: all 0.25s ease;
+    border-radius: 50px;
+    padding: 0.75rem 2.2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-hero-cta:hover,
+.hero-section .btn-warning:hover {
+    background-color: var(--brand-coral-hover) !important;
+    border-color: var(--brand-coral-hover) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(255, 107, 91, 0.4) !important;
+}
+
+.hero-section .btn-outline-light {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border-radius: 50px;
+    padding: 0.75rem 1.85rem;
+    border-width: 1.5px;
+    transition: all 0.25s ease;
+}
+
+.hero-section .btn-outline-light:hover {
+    transform: translateY(-2px);
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================================
+   7. 브랜드 특징 섹션 (Slab Serif + Sans Serif 조화)
+   ============================================================ */
+#features i {
+    color: var(--brand-coral) !important;
+}
+
+/* [Slab Serif] 특징 타이틀: 단단하고 신뢰감 있는 슬랩 세리프 */
+.feature-title.font-slab {
+    font-family: var(--font-slab);
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--brand-navy);
+    letter-spacing: -0.3px;
+}
+
+#features small.font-sans {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+/* ============================================================
+   8. 상품 목록 섹션 (4대 폰트의 완성도 높은 조화)
+   ============================================================ */
+/* [Script] 섹션 서브 감성 태그 */
+.section-script-accent {
+    font-family: var(--font-script);
+    font-size: 1.85rem;
+    color: var(--brand-coral);
+    line-height: 1.1;
+    margin-bottom: 0.15rem;
+}
+
+/* [Slab Serif] 섹션 키커 뱃지 */
+.section-kicker.font-slab {
+    font-family: var(--font-slab);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    background-color: var(--brand-coral-light) !important;
+    color: var(--brand-coral) !important;
+    padding: 0.35rem 0.65rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 107, 91, 0.3);
+}
+
+/* [Serif] 섹션 메인 헤딩 */
+.section-heading.font-serif {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--brand-navy);
+    letter-spacing: -0.5px;
+}
+
+.see-all-link {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    transition: color 0.2s ease;
+}
+
+.see-all-link:hover {
+    color: var(--brand-coral) !important;
+}
+
+/* 9. 상품 카드 컴포넌트 */
+.product-card {
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease;
+    background: #ffffff;
+    border-radius: 12px;
+}
+
+.product-card:hover {
+    transform: scale(1.02);
+    box-shadow: 0 16px 32px rgba(26, 42, 74, 0.14) !important;
+}
+
+.product-img-box {
+    height: 280px;
+    background-color: #f1f3f5;
+    position: relative;
+}
+
+.product-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.product-card:hover .product-img {
+    transform: scale(1.04);
+}
+
+/* 위시리스트 버튼 */
+.btn-wishlist {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: background-color 0.2s, transform 0.2s;
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.btn-wishlist:hover {
+    background-color: #ffffff;
+    transform: scale(1.1);
+}
+
+.btn-wishlist i {
+    color: var(--brand-coral) !important;
+}
+
+/* [Slab Serif] 상품 카테고리 태그 */
+.product-category.font-slab {
+    font-family: var(--font-slab);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #8b95a5 !important;
+    letter-spacing: 1.2px;
+}
+
+/* [Serif] 상품명: 세련되고 감각적인 세리프 타이틀 */
+.product-title.font-serif {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--brand-navy);
+    letter-spacing: -0.3px;
+    margin-bottom: 0.5rem;
+}
+
+/* [Sans Serif] 상품 설명문 */
+.product-desc.font-sans {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: #6c757d;
+}
+
+/* [Sans Serif] 가격 정보 */
+.product-price.font-sans {
+    font-family: var(--font-sans);
+    font-weight: 800 !important;
+    font-size: 1.25rem !important;
+    color: var(--brand-navy) !important;
+    letter-spacing: -0.5px;
+}
+
+/* [Sans Serif] 장바구니 담기 버튼 */
+.btn-add-cart,
+.product-card .btn-dark {
+    font-family: var(--font-sans);
+    background-color: var(--brand-navy);
+    border-color: var(--brand-navy);
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+}
+
+.btn-add-cart:hover,
+.product-card .btn-dark:hover {
+    background-color: var(--brand-coral);
+    border-color: var(--brand-coral);
+    box-shadow: 0 4px 12px rgba(255, 107, 91, 0.3);
+}
+
+/* ============================================================
+   10. 푸터 영역 (Serif 브랜드 + Slab 섹션명 + Sans 본문)
+   ============================================================ */
+footer.bg-dark {
+    background-color: var(--brand-navy-dark) !important;
+}
+
+footer h5.font-serif {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    letter-spacing: 1px;
+}
+
+footer h6.font-slab {
+    font-family: var(--font-slab);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: #f8f9fa !important;
+}
+
+footer p, footer a, footer small {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+}
+
+footer a:hover {
+    color: var(--brand-coral) !important;
+}
+
+/* ============================================================
+   11. 미디어 쿼리 (반응형 최적화)
+   ============================================================ */
+@media (max-width: 768px) {
+    .hero-section {
+        min-height: 460px;
+        padding: 55px 0 50px;
+    }
+
+    .hero-script-accent {
+        font-size: 1.85rem;
+    }
+
+    .hero-title.font-serif {
+        font-size: 2.15rem;
+    }
+
+    .hero-desc.font-sans {
+        font-size: 0.95rem;
+        padding: 0 10px;
+    }
+
+    .section-script-accent {
+        font-size: 1.55rem;
+    }
+
+    .section-heading.font-serif {
+        font-size: 1.6rem;
+    }
+
+    /* 모바일 1열 카드 배치 */
+    #products .row.g-4 > [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .product-img-box {
+        height: 320px;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 991px) {
+    #products .row.g-4 > [class*="col-"] {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+@media (min-width: 992px) {
+    #products .row.g-4 > [class*="col-"] {
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+}
+
