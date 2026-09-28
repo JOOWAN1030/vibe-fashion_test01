@@ -61,7 +61,10 @@
 
                     {% if order.discount_amount > 0 %}
                     <div class="col-sm-3 text-ms-red">쿠폰 할인</div>
-                    <div class="col-sm-9 fw-bold text-ms-red">-{{ "{:,}".format(order.discount_amount) }}원 (15% 웰컴팩)</div>
+                    <div class="col-sm-9 fw-bold text-ms-red">
+                        -{{ "{:,}".format(order.discount_amount) }}원 
+                        <span class="text-muted extra-small ms-1">({{ order.coupon_name or '쿠폰 할인 적용' }})</span>
+                    </div>
                     {% endif %}
 
                     <div class="col-sm-3 text-dark fw-bold pt-2 border-top mt-2">최종 결제 금액</div>

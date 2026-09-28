@@ -167,6 +167,38 @@ def clear_cart():
 # ============================================================
 # 2. 주문서 작성 및 모의 결제 (Checkout)
 # ============================================================
+AVAILABLE_COUPONS = [
+    {
+        "code": "WELCOME15",
+        "name": "[신규회원] 웰컴 15% 전품목 할인 쿠폰",
+        "type": "percent",
+        "value": 15,
+        "badge": "15%"
+    },
+    {
+        "code": "OUTER20",
+        "name": "[시즌오프] 아우터/슈즈 페스티벌 20% 특별 쿠폰",
+        "type": "percent",
+        "value": 20,
+        "badge": "20%"
+    },
+    {
+        "code": "VIBE5000",
+        "name": "[앱전용] 첫 구매 감사 5,000원 즉시 할인권",
+        "type": "amount",
+        "value": 5000,
+        "badge": "5천원"
+    },
+    {
+        "code": "FREESHIP",
+        "name": "[VIP] 전 지역 무조건 무료 배송 티켓",
+        "type": "shipping",
+        "value": 3000,
+        "badge": "배송비"
+    }
+]
+
+
 @order_bp.route("/checkout", methods=["GET", "POST"])
 def checkout():
     """주문서 작성 페이지"""
@@ -178,7 +210,13 @@ def checkout():
     totals = calculate_cart_totals(cart)
     user = session.get("user", {})
 
-    return render_template("order/checkout.html", cart=cart, totals=totals, user=user)
+    return render_template(
+        "order/checkout.html",
+        cart=cart,
+        totals=totals,
+        user=user,
+        coupons=AVAILABLE_COUPONS
+    )
 
 
 @order_bp.route("/pay", methods=["POST"])
@@ -200,14 +238,23 @@ def process_payment():
     shipping_address = request.form.get("shipping_address", "").strip() or "서울특별시 성동구 아차산로 13길 11"
     shipping_memo = request.form.get("shipping_memo", "배송 전 연락 바랍니다.")
     pay_method = request.form.get("pay_method", "card") # "card", "kakaopay", "tosspay", "vbank"
-    coupon_applied = request.form.get("coupon_applied") == "Y"
+    selected_coupon_code = request.form.get("selected_coupon_code", "").strip()
 
-    # 쿠폰 적용 시 15% 할인 계산
-    final_pay = totals["final_amount"]
+    # 쿠폰 적용 로직
     discount_val = 0
-    if coupon_applied:
-        discount_val = int(totals["total_goods_price"] * 0.15)
-        final_pay = max(0, final_pay - discount_val)
+    coupon_name = None
+    applied_coupon = next((c for c in AVAILABLE_COUPONS if c["code"] == selected_coupon_code), None)
+    
+    if applied_coupon:
+        coupon_name = applied_coupon["name"]
+        if applied_coupon["type"] == "percent":
+            discount_val = int(totals["total_goods_price"] * (applied_coupon["value"] / 100))
+        elif applied_coupon["type"] == "amount":
+            discount_val = min(totals["total_goods_price"], applied_coupon["value"])
+        elif applied_coupon["type"] == "shipping":
+            discount_val = totals["shipping_fee"]
+
+    final_pay = max(0, totals["total_goods_price"] + totals["shipping_fee"] - discount_val)
 
     # 고유 주문번호 생성 (예: 20260928-VB8912)
     order_number = f"{datetime.datetime.now().strftime('%Y%m%d')}-VB{uuid.uuid4().hex[:6].upper()}"
@@ -223,6 +270,7 @@ def process_payment():
         "shipping_address": shipping_address,
         "shipping_memo": shipping_memo,
         "pay_method": pay_method,
+        "coupon_name": coupon_name,
         "total_goods_price": totals["total_goods_price"],
         "shipping_fee": totals["shipping_fee"],
         "discount_amount": discount_val,
