@@ -7,30 +7,49 @@ const wishlistedItems = new Set();
 let activeFilter = 'all';
 
 /**
- * 1. 장바구니 담기 기능 (토스트 알림 + 뱃지 카운트 애니메이션)
+ * 1. 장바구니 담기 기능 (백엔드 세션 API 연동 + 토스트 팝업)
  */
-function addToCart(productName, price, imgUrl) {
-    cartCount += 1;
-    
-    // 네비게이션 헤더 장바구니 뱃지 업데이트
-    const cartCountBadge = document.getElementById("cartCount");
-    if (cartCountBadge) {
-        cartCountBadge.textContent = cartCount;
-        cartCountBadge.classList.add("scale-pop");
-        setTimeout(() => cartCountBadge.classList.remove("scale-pop"), 300);
-    }
+function addToCart(productName, price, imgUrl, option = "FREE / 기본") {
+    fetch('/order/cart/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: productName,
+            price: price,
+            image_url: imgUrl,
+            option: option,
+            quantity: 1
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // 헤더 카운트 뱃지 갱신
+            const cartCountBadge = document.getElementById("cartCount");
+            if (cartCountBadge) {
+                cartCountBadge.textContent = data.cartCount;
+                cartCountBadge.classList.add("scale-pop");
+                setTimeout(() => cartCountBadge.classList.remove("scale-pop"), 300);
+            }
 
-    // Bootstrap 토스트 팝업 표시
-    const toastTitle = document.getElementById("toastTitle");
-    const toastMessage = document.getElementById("toastMessage");
-    const toastElement = document.getElementById("cartToast");
-    
-    if (toastElement) {
-        if (toastTitle) toastTitle.textContent = "쇼핑백에 추가되었습니다";
-        if (toastMessage) toastMessage.textContent = `${productName} (${price || ''})가 추가되었습니다.`;
-        const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
-        toast.show();
-    }
+            // 토스트 팝업 노출
+            const toastTitle = document.getElementById("toastTitle");
+            const toastMessage = document.getElementById("toastMessage");
+            const toastElement = document.getElementById("cartToast");
+            
+            if (toastElement) {
+                if (toastTitle) toastTitle.textContent = "장바구니에 담겼습니다";
+                if (toastMessage) toastMessage.innerHTML = `${productName} (${price || ''})가 추가되었습니다.<br><a href="/order/cart" class="text-white text-decoration-underline fw-bold mt-1 d-inline-block">장바구니 바로가기 &gt;</a>`;
+                const toast = new bootstrap.Toast(toastElement, { delay: 3500 });
+                toast.show();
+            }
+        }
+    })
+    .catch(err => {
+        console.error("Cart Add Error:", err);
+    });
 }
 
 /**

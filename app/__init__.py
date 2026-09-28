@@ -30,8 +30,10 @@ def create_app():
     from app.routes.main import main_bp
     from app.routes.auth import auth_bp
     from app.routes.board import board_bp
+    from app.routes.order import order_bp
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(board_bp)
+    app.register_blueprint(order_bp)
 
     return app

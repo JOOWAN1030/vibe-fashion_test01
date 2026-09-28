@@ -95,10 +95,10 @@
                         <span id="wishlistCount" class="ms-badge-counter">0</span>
                     </button>
 
-                    <button class="ms-header-action-btn" type="button" title="장바구니" id="cartBtn">
+                    <a href="{{ url_for('order.cart_view') }}" class="ms-header-action-btn text-decoration-none" title="장바구니" id="cartBtn">
                         <i class="bi bi-bag"></i>
-                        <span id="cartCount" class="ms-badge-counter">0</span>
-                    </button>
+                        <span id="cartCount" class="ms-badge-counter">{{ session.get('cart', [])|length }}</span>
+                    </a>
 
                     {% if session.get('user') %}
                     <a href="{{ url_for('auth.logout') }}" class="ms-header-action-btn d-md-none" title="로그아웃">

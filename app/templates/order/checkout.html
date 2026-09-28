@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}주문/결제 - VIBE STORE{% endblock %}
+
+{% block content %}
+<div class="container-xl px-3 py-5">
+    <!-- 단계 인디케이터 -->
+    <div class="d-flex justify-content-between align-items-end border-bottom border-2 border-dark pb-3 mb-4">
+        <h2 class="ms-section-title mb-0">주문 / 결제 (ORDER &amp; PAY)</h2>
+        <div class="d-none d-md-flex align-items-center gap-2 extra-small font-sans">
+            <span class="text-muted">01 장바구니</span>
+            <i class="bi bi-chevron-right text-muted"></i>
+            <span class="fw-bold text-dark">02 주문/결제</span>
+            <i class="bi bi-chevron-right text-muted"></i>
+            <span class="text-muted">03 결제완료</span>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('order.process_payment') }}" id="checkoutForm">
+        <div class="row g-4">
+            <!-- 좌측: 주문 정보 입력 (배송지, 주문자, 쿠폰, 결제수단) -->
+            <div class="col-lg-8">
+                <!-- 1. 주문 상품 확인 요약 -->
+                <div class="p-4 border bg-white mb-4">
+                    <h5 class="fw-bold fs-6 pb-2 border-bottom font-sans mb-3">주문 상품 ({{ totals.count }}개)</h5>
+                    <div class="d-flex flex-column gap-2">
+                        {% for item in cart %}
+                        <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-light">
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="{{ item.image_url }}" alt="{{ item.name }}" style="width: 50px; height: 60px; object-fit: contain; background: #fafafa;" class="border">
+                                <div>
+                                    <div class="small fw-bold">{{ item.name }}</div>
+                                    <div class="extra-small text-muted">옵션: {{ item.option }} | 수량: {{ item.quantity }}개</div>
+                                </div>
+                            </div>
+                            <span class="small fw-bold">{{ "{:,}".format(item.price * item.quantity) }}원</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- 2. 배송지 정보 -->
+                <div class="p-4 border bg-white mb-4">
+                    <h5 class="fw-bold fs-6 pb-2 border-bottom font-sans mb-3">배송지 정보</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label extra-small text-muted fw-bold">받는 사람 *</label>
+                            <input type="text" name="shipping_name" class="form-control rounded-0 small" value="{{ user.get('name', '홍길동') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label extra-small text-muted fw-bold">연락처 *</label>
+                            <input type="tel" name="shipping_phone" class="form-control rounded-0 small" value="010-1234-5678" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label extra-small text-muted fw-bold">배송 주소 *</label>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control rounded-0 small" value="04781" style="max-width: 120px;" readonly>
+                                <button class="btn btn-outline-dark rounded-0 small" type="button" onclick="alert('기본 주소지가 자동 설정되었습니다.');">우편번호 검색</button>
+                            </div>
+                            <input type="text" name="shipping_address" class="form-control rounded-0 small mb-2" value="서울특별시 성동구 아차산로 13길 11" required>
+                            <input type="text" name="shipping_address_detail" class="form-control rounded-0 small" value="무신사 캠퍼스 V동 4층">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label extra-small text-muted fw-bold">배송 요청사항</label>
+                            <select name="shipping_memo" class="form-select rounded-0 small">
+                                <option value="부재 시 문 앞에 놓아주세요.">부재 시 문 앞에 놓아주세요.</option>
+                                <option value="배송 전 미리 연락 바랍니다.">배송 전 미리 연락 바랍니다.</option>
+                                <option value="경비실에 맡겨주세요.">경비실에 맡겨주세요.</option>
+                                <option value="택배함에 보관해 주세요.">택배함에 보관해 주세요.</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. 쿠폰 및 할인 혜택 -->
+                <div class="p-4 border bg-white mb-4">
+                    <h5 class="fw-bold fs-6 pb-2 border-bottom font-sans mb-3">할인 혜택</h5>
+                    <div class="p-3 bg-light border d-flex justify-content-between align-items-center">
+                        <div class="form-check mb-0">
+                            <input class="form-check-input rounded-0" type="checkbox" id="couponCheck" name="coupon_applied" value="Y" onchange="toggleCoupon(this)">
+                            <label class="form-check-label small fw-bold font-sans text-dark" for="couponCheck">
+                                <span class="badge bg-ms-red me-1">15% 할인</span> 신규 회원 웰컴 쿠폰팩 적용
+                            </label>
+                            <div class="extra-small text-muted">주문 금액의 15% 즉시 할인 혜택</div>
+                        </div>
+                        <span class="fw-bold text-ms-red font-sans" id="couponDiscountText">-0원</span>
+                    </div>
+                </div>
+
+                <!-- 4. 결제 수단 선택 (모의 결제) -->
+                <div class="p-4 border bg-white mb-4">
+                    <h5 class="fw-bold fs-6 pb-2 border-bottom font-sans mb-3">결제 수단 선택</h5>
+                    <div class="row g-2">
+                        <div class="col-sm-3 col-6">
+                            <input type="radio" class="btn-check" name="pay_method" id="pay_card" value="card" checked>
+                            <label class="btn btn-outline-dark w-100 py-3 rounded-0 small fw-bold text-center" for="pay_card">
+                                <i class="bi bi-credit-card d-block fs-5 mb-1"></i>신용/체크카드
+                            </label>
+                        </div>
+                        <div class="col-sm-3 col-6">
+                            <input type="radio" class="btn-check" name="pay_method" id="pay_kakao" value="kakaopay">
+                            <label class="btn btn-outline-dark w-100 py-3 rounded-0 small fw-bold text-center" for="pay_kakao" style="border-color: #FEE500;">
+                                <i class="bi bi-chat-fill d-block fs-5 mb-1 text-warning"></i>카카오페이
+                            </label>
+                        </div>
+                        <div class="col-sm-3 col-6">
+                            <input type="radio" class="btn-check" name="pay_method" id="pay_toss" value="tosspay">
+                            <label class="btn btn-outline-dark w-100 py-3 rounded-0 small fw-bold text-center" for="pay_toss">
+                                <i class="bi bi-lightning-charge-fill d-block fs-5 mb-1 text-primary"></i>토스페이
+                            </label>
+                        </div>
+                        <div class="col-sm-3 col-6">
+                            <input type="radio" class="btn-check" name="pay_method" id="pay_vbank" value="vbank">
+                            <label class="btn btn-outline-dark w-100 py-3 rounded-0 small fw-bold text-center" for="pay_vbank">
+                                <i class="bi bi-bank d-block fs-5 mb-1"></i>무통장입금
+                            </label>
+                        </div>
+                    </div>
+                    <div class="alert alert-secondary extra-small mt-3 mb-0 rounded-0">
+                        <i class="bi bi-info-circle me-1"></i> 본 사이트는 <strong>포트폴리오용 모의 결제 시스템</strong>으로 실제 금융 거래 승인이 발생하지 않습니다.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 우측: 최종 결제 정보 요약 -->
+            <div class="col-lg-4">
+                <div class="p-4 border bg-light sticky-top" style="top: 80px;">
+                    <h6 class="fw-bold pb-2 border-bottom border-dark font-sans">최종 결제 금액</h6>
+                    
+                    <div class="d-flex justify-content-between align-items-center py-2 small text-muted font-sans">
+                        <span>총 상품 금액</span>
+                        <span class="text-dark fw-bold">{{ "{:,}".format(totals.total_goods_price) }}원</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center py-2 small text-muted font-sans">
+                        <span>배송비</span>
+                        <span class="text-dark fw-bold">
+                            {% if totals.shipping_fee == 0 %}무료{% else %}{{ "{:,}".format(totals.shipping_fee) }}원{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center py-2 small text-muted font-sans">
+                        <span>쿠폰 할인 금액</span>
+                        <span class="text-ms-red fw-bold" id="sideDiscount">-0원</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 mt-2 border-top border-dark">
+                        <span class="fw-bold font-sans">최종 결제 금액</span>
+                        <span class="fw-bolder fs-4 text-ms-red font-sans" id="sideFinalAmount">{{ "{:,}".format(totals.final_amount) }}원</span>
+                    </div>
+
+                    <!-- 약관 동의 -->
+                    <div class="form-check extra-small text-muted mt-3 pt-2 border-top">
+                        <input class="form-check-input rounded-0" type="checkbox" id="agreePay" required checked>
+                        <label class="form-check-label font-sans" for="agreePay">
+                            [필수] 구매조건 확인 및 결제진행에 동의합니다.
+                        </label>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn ms-btn-black py-3 text-center w-100 fw-bold fs-6">
+                            <span id="btnPayAmount">{{ "{:,}".format(totals.final_amount) }}원</span> 모의 결제하기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+const baseGoods = {{ totals.total_goods_price }};
+const baseShipping = {{ totals.shipping_fee }};
+const baseTotal = {{ totals.final_amount }};
+
+function toggleCoupon(checkbox) {
+    let discount = 0;
+    if (checkbox.checked) {
+        discount = Math.floor(baseGoods * 0.15);
+    }
+    const finalVal = Math.max(0, baseTotal - discount);
+    
+    document.getElementById("couponDiscountText").textContent = `-${discount.toLocaleString()}원`;
+    document.getElementById("sideDiscount").textContent = `-${discount.toLocaleString()}원`;
+    document.getElementById("sideFinalAmount").textContent = `${finalVal.toLocaleString()}원`;
+    document.getElementById("btnPayAmount").textContent = `${finalVal.toLocaleString()}원`;
+}
+</script>
+{% endblock %}

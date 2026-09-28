@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}주문/결제 완료 - VIBE STORE{% endblock %}
+
+{% block content %}
+<div class="container-xl px-3 py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-12">
+            <!-- 주문 완료 헤더 배너 -->
+            <div class="text-center p-5 border bg-white mb-4">
+                <div class="mb-3">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-dark text-white rounded-circle" style="width: 60px; height: 60px;">
+                        <i class="bi bi-check2 fs-1"></i>
+                    </span>
+                </div>
+                <h3 class="fw-bold font-sans mb-2 text-dark">주문 및 결제가 정상 완료되었습니다!</h3>
+                <p class="text-muted small mb-3">고객님의 소중한 주문이 성공적으로 접수되어 상품 출고를 준비 중입니다.</p>
+                
+                <div class="p-3 bg-light d-inline-block border text-start extra-small font-sans">
+                    <div>주문번호: <strong class="text-dark">{{ order.order_number }}</strong></div>
+                    <div>주문일시: <span class="text-muted">{{ order.ordered_at }}</span></div>
+                </div>
+            </div>
+
+            <!-- 주문 및 배송 상세 정보 카드 -->
+            <div class="p-4 border bg-white mb-4">
+                <h5 class="fw-bold fs-6 pb-2 border-bottom font-sans mb-3">배송 정보</h5>
+                <div class="row g-2 small font-sans">
+                    <div class="col-sm-3 text-muted">받는 사람</div>
+                    <div class="col-sm-9 fw-bold text-dark">{{ order.shipping_name }}</div>
+
+                    <div class="col-sm-3 text-muted">연락처</div>
+                    <div class="col-sm-9 text-dark">{{ order.shipping_phone }}</div>
+
+                    <div class="col-sm-3 text-muted">배송지 주소</div>
+                    <div class="col-sm-9 text-dark">{{ order.shipping_address }}</div>
+
+                    <div class="col-sm-3 text-muted">배송 요청사항</div>
+                    <div class="col-sm-9 text-dark">{{ order.shipping_memo }}</div>
+                </div>
+            </div>
+
+            <!-- 결제 금액 상세 카드 -->
+            <div class="p-4 border bg-white mb-4">
+                <h5 class="fw-bold fs-6 pb-2 border-bottom font-sans mb-3">결제 정보</h5>
+                <div class="row g-2 small font-sans">
+                    <div class="col-sm-3 text-muted">결제 수단</div>
+                    <div class="col-sm-9 fw-bold text-dark">
+                        {% if order.pay_method == 'kakaopay' %}카카오페이 (간편결제)
+                        {% elif order.pay_method == 'tosspay' %}토스페이 (간편결제)
+                        {% elif order.pay_method == 'vbank' %}가상계좌 (무통장입금)
+                        {% else %}신용/체크카드 (일시불)
+                        {% endif %}
+                    </div>
+
+                    <div class="col-sm-3 text-muted">총 상품금액</div>
+                    <div class="col-sm-9 text-dark">{{ "{:,}".format(order.total_goods_price) }}원</div>
+
+                    <div class="col-sm-3 text-muted">배송비</div>
+                    <div class="col-sm-9 text-dark">{{ "{:,}".format(order.shipping_fee) }}원</div>
+
+                    {% if order.discount_amount > 0 %}
+                    <div class="col-sm-3 text-ms-red">쿠폰 할인</div>
+                    <div class="col-sm-9 fw-bold text-ms-red">-{{ "{:,}".format(order.discount_amount) }}원 (15% 웰컴팩)</div>
+                    {% endif %}
+
+                    <div class="col-sm-3 text-dark fw-bold pt-2 border-top mt-2">최종 결제 금액</div>
+                    <div class="col-sm-9 fw-bolder fs-5 text-ms-red pt-2 border-top mt-2">{{ "{:,}".format(order.final_amount) }}원</div>
+                </div>
+            </div>
+
+            <!-- 구매 상품 리스트 -->
+            <div class="p-4 border bg-white mb-4">
+                <h5 class="fw-bold fs-6 pb-2 border-bottom font-sans mb-3">주문 상품 목록 (총 {{ order.order_items|length }}개)</h5>
+                <div class="d-flex flex-column gap-3">
+                    {% for item in order.order_items %}
+                    <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-light">
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="{{ item.image_url }}" alt="{{ item.name }}" style="width: 50px; height: 60px; object-fit: contain; background: #fafafa;" class="border">
+                            <div>
+                                <div class="small fw-bold">{{ item.name }}</div>
+                                <div class="extra-small text-muted">옵션: {{ item.option }} | 수량: {{ item.quantity }}개</div>
+                            </div>
+                        </div>
+                        <span class="small fw-bold">{{ "{:,}".format(item.price * item.quantity) }}원</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- 하단 버튼 그룹 -->
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="{{ url_for('main.index') }}" class="btn btn-outline-dark rounded-0 px-4 py-3 fw-bold small">
+                    쇼핑 계속하기
+                </a>
+                <a href="{{ url_for('board.list_inquiries', type='shipping') }}" class="btn ms-btn-black px-4 py-3 fw-bold small">
+                    배송 현황 문의하기
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
