@@ -270,9 +270,11 @@ body {
     backdrop-filter: blur(8px);
     border: 1px solid rgba(229, 179, 105, 0.35);
     border-radius: 50px;
-    padding: 0.4rem 1rem;
-    font-size: 0.78rem;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.8rem;
     color: var(--color-gold);
+    letter-spacing: 2px;
+    word-spacing: 4px;
 }
 
 .pulse-dot {
