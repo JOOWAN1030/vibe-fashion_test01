@@ -26,43 +26,70 @@ if SUPABASE_URL and SUPABASE_ANON_KEY:
 def index():
     """
     메인 쇼핑몰 홈 화면
-    - Supabase products 테이블에서 활성(status='active') 상품 조회
-    - 가격 포맷팅 및 에러 핸들링
+    - Supabase products 테이블에서 활성(status='active') 상품 조회 (카테고리 및 이미지 조인)
+    - 할인가, 정상가, 할인율, 카테고리 정보 포맷팅
     """
     products = []
+    categories = []
 
     try:
         if supabase:
+            # 1. 카테고리 목록 조회
+            try:
+                cat_res = supabase.table("categories").select("id, name, slug, sort_order").order("sort_order").execute()
+                categories = cat_res.data or []
+            except Exception as e:
+                print(f"[Supabase Notice] 카테고리 조회 실패: {e}", file=sys.stderr)
+
+            # 2. 상품 목록 조회 (카테고리 정보 및 이미지 조인)
             raw_products = []
-            # status='active' 조건으로 최신 상품 순으로 조회
             try:
                 response = (
                     supabase.table("products")
-                    .select("*, product_images(image_url, is_primary)")
+                    .select("*, categories(id, name, slug), product_images(image_url, is_primary)")
                     .eq("status", "active")
                     .order("created_at", desc=False)
                     .execute()
                 )
                 raw_products = response.data or []
             except Exception as query_err:
-                # status 컬럼 또는 기타 조회 실패 시 fallback
-                print(f"[Supabase Notice] 기본 조회 실패 ({query_err}), 전체 조회 fallback.", file=sys.stderr)
-                response = (
-                    supabase.table("products")
-                    .select("*, product_images(image_url, is_primary)")
-                    .execute()
-                )
-                raw_products = response.data or []
+                print(f"[Supabase Notice] 카테고리 조인 조회 실패 ({query_err}), 기본 조회 fallback.", file=sys.stderr)
+                try:
+                    response = (
+                        supabase.table("products")
+                        .select("*, product_images(image_url, is_primary)")
+                        .eq("status", "active")
+                        .execute()
+                    )
+                    raw_products = response.data or []
+                except Exception as e:
+                    raw_products = []
 
             for item in raw_products:
-                price_val = item.get("sale_price") or item.get("price") or 0
+                orig_price = item.get("price") or 0
+                sale_price = item.get("sale_price")
+                
+                # 최종 판매 가격 및 할인율 계산
                 try:
-                    price_int = int(float(price_val))
-                    formatted_price = f"{price_int:,}원"
+                    orig_int = int(float(orig_price))
+                    formatted_orig_price = f"{orig_int:,}원"
                 except (ValueError, TypeError):
-                    formatted_price = f"{price_val}원"
+                    orig_int = 0
+                    formatted_orig_price = f"{orig_price}원"
 
-                # 썸네일 이미지 추출 (직접 필드 또는 product_images 관계 데이터)
+                discount_rate = None
+                if sale_price is not None:
+                    try:
+                        sale_int = int(float(sale_price))
+                        formatted_price = f"{sale_int:,}원"
+                        if orig_int > sale_int and orig_int > 0:
+                            discount_rate = int(round((orig_int - sale_int) / orig_int * 100))
+                    except (ValueError, TypeError):
+                        formatted_price = f"{sale_price}원"
+                else:
+                    formatted_price = formatted_orig_price
+
+                # 썸네일 이미지 추출
                 thumbnail_url = item.get("thumbnail_url") or item.get("image_url")
                 if not thumbnail_url and item.get("product_images"):
                     images = item["product_images"]
@@ -70,15 +97,24 @@ def index():
                     thumbnail_url = primary_img or (images[0]["image_url"] if images else None)
 
                 if not thumbnail_url:
-                    thumbnail_url = "https://picsum.photos/seed/fashion/600/600"
+                    thumbnail_url = "https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&auto=format&fit=crop&q=80"
+
+                # 카테고리 정보 추출
+                cat_info = item.get("categories") or {}
+                cat_name = cat_info.get("name") if isinstance(cat_info, dict) else item.get("category", "")
+                cat_slug = cat_info.get("slug", "all") if isinstance(cat_info, dict) else "all"
 
                 products.append({
                     "id": item.get("id"),
                     "name": item.get("name", "상품명 없음"),
+                    "slug": item.get("slug", ""),
                     "price": formatted_price,
+                    "original_price": formatted_orig_price if discount_rate else None,
+                    "discount_rate": discount_rate,
                     "thumbnail_url": thumbnail_url,
                     "description": item.get("description", ""),
-                    "category": item.get("category", "")
+                    "category": cat_name,
+                    "category_slug": cat_slug
                 })
         else:
             print("[Supabase Warning] Supabase 클라이언트가 초기화되지 않았습니다.", file=sys.stderr)
@@ -87,5 +123,5 @@ def index():
         traceback.print_exc()
         products = []
 
-    return render_template("index.html", products=products)
+    return render_template("index.html", products=products, categories=categories)
 
