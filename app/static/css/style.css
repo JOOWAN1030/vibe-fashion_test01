@@ -245,6 +245,69 @@ body {
     border-radius: 50px;
 }
 
+/* 인증 버튼 및 사용자 프로필 메뉴 */
+.btn-auth-login {
+    color: var(--color-navy);
+    font-size: 0.82rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 50px;
+    transition: var(--transition-smooth);
+}
+
+.btn-auth-login:hover {
+    background: #f2f4f7;
+    color: var(--color-navy);
+}
+
+.btn-auth-register {
+    background: var(--color-navy);
+    color: #ffffff;
+    font-size: 0.82rem;
+    padding: 0.45rem 1rem;
+    border-radius: 50px;
+    border: none;
+    transition: var(--transition-smooth);
+}
+
+.btn-auth-register:hover {
+    background: var(--color-gold);
+    color: var(--color-navy);
+}
+
+.btn-user-profile {
+    border: 1px solid var(--color-border);
+    background: #ffffff;
+    border-radius: 50px;
+    padding: 0.35rem 0.8rem;
+    transition: var(--transition-smooth);
+}
+
+.btn-user-profile:hover {
+    background: #f8f9fa;
+}
+
+.user-avatar-circle {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--color-navy);
+    color: var(--color-gold);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.user-dropdown-menu {
+    min-width: 220px;
+    border: 1px solid var(--color-border);
+}
+
+.user-dropdown-menu .dropdown-item:hover {
+    background: #f8f9fa;
+    color: var(--color-navy);
+}
+
 /* ============================================================
    5. 히어로 에디토리얼 섹션 (Editorial Cinema Hero)
    ============================================================ */
@@ -724,6 +787,141 @@ body {
     .product-media-frame {
         height: 290px;
     }
+}
+
+/* ============================================================
+   12. 인증 시스템 디자인 (Auth Pages, Inputs, SNS Buttons)
+   ============================================================ */
+.auth-page-section {
+    min-height: 80vh;
+    background: linear-gradient(180deg, #fbfbfd 0%, #f0f2f5 100%);
+}
+
+.auth-card {
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: var(--transition-smooth);
+}
+
+.auth-title {
+    font-size: 1.85rem;
+    color: var(--color-navy);
+}
+
+.input-group-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    color: #98a2b3;
+    font-size: 1rem;
+    pointer-events: none;
+    z-index: 4;
+}
+
+.auth-input {
+    padding: 0.75rem 1rem 0.75rem 2.8rem;
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    font-size: 0.9rem;
+    transition: var(--transition-smooth);
+    background-color: #fafbfc;
+}
+
+.auth-input:focus {
+    background-color: #ffffff;
+    border-color: var(--color-navy);
+    box-shadow: 0 0 0 3px rgba(12, 18, 30, 0.08);
+}
+
+.auth-link:hover {
+    color: var(--color-navy) !important;
+    text-decoration: underline !important;
+}
+
+/* SNS 소셜 로그인 버튼 (카카오, 네이버, 구글) */
+.btn-sns {
+    border: none;
+    font-size: 0.88rem;
+    transition: var(--transition-smooth);
+}
+
+.btn-kakao {
+    background-color: #FEE500;
+    color: #191919;
+}
+.btn-kakao:hover {
+    background-color: #ebd300;
+    color: #191919;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(254, 229, 0, 0.4);
+}
+
+.btn-naver {
+    background-color: #03C75A;
+    color: #ffffff;
+}
+.btn-naver:hover {
+    background-color: #02b150;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(3, 199, 90, 0.4);
+}
+
+.btn-google {
+    background-color: #ffffff;
+    color: #3c4043;
+    border: 1px solid var(--color-border);
+}
+.btn-google:hover {
+    background-color: #f8f9fa;
+    color: #202124;
+    border-color: #dadce0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* SNS 서클 버튼 (회원가입 상단용) */
+.sns-circle-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.15rem;
+    transition: var(--transition-smooth);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+.sns-circle-btn:hover {
+    transform: translateY(-2px);
+}
+.kakao-circle {
+    background-color: #FEE500;
+    color: #191919;
+}
+.naver-circle {
+    background-color: #03C75A;
+    color: #ffffff;
+}
+.google-circle {
+    background-color: #ffffff;
+    color: #4285F4;
+    border: 1px solid var(--color-border);
+}
+
+.recovery-tabs .nav-link {
+    color: #667085;
+    transition: var(--transition-smooth);
+}
+.recovery-tabs .nav-link.active {
+    background-color: var(--color-navy);
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(12, 18, 30, 0.15);
 }
 
 /* [Script] 히어로 상단 필기체 감성 액센트 */

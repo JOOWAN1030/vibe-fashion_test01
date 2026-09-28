@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}로그인 - VIBE FASHION{% endblock %}
+
+{% block content %}
+<section class="auth-page-section py-5 d-flex align-items-center">
+    <div class="container py-md-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7 col-11">
+                <div class="auth-card p-4 p-md-5 rounded-4 shadow-lg border-0 bg-white">
+                    <!-- 헤더 영역 -->
+                    <div class="text-center mb-4">
+                        <span class="badge badge-subtle-gold font-sans fw-bold mb-2">VIBE ATELIER</span>
+                        <h2 class="auth-title font-serif fw-bold mb-2">Welcome Back</h2>
+                        <p class="text-muted small font-sans mb-0">당신만의 특별한 감각을 깨우는 프리미엄 쇼핑</p>
+                    </div>
+
+                    <!-- 플래시 메시지 -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show extra-small py-2 px-3 rounded-3" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close py-2 px-3" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- 로그인 폼 -->
+                    <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form">
+                        <div class="mb-3">
+                            <label for="email" class="form-label extra-small text-uppercase fw-bold text-muted font-sans">이메일 계정</label>
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control auth-input" id="email" name="email" value="{{ email or '' }}" placeholder="example@vibe.com" required autofocus>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="password" class="form-label extra-small text-uppercase fw-bold text-muted font-sans mb-0">비밀번호</label>
+                                <a href="{{ url_for('auth.forgot_password') }}" class="extra-small text-muted text-decoration-none auth-link">비밀번호 찾기</a>
+                            </div>
+                            <div class="input-group-modern">
+                                <span class="input-icon"><i class="bi bi-lock"></i></span>
+                                <input type="password" class="form-control auth-input" id="password" name="password" placeholder="비밀번호 입력" required>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="rememberMe">
+                                <label class="form-check-label extra-small text-muted font-sans" for="rememberMe">
+                                    로그인 상태 유지
+                                </label>
+                            </div>
+                            <a href="{{ url_for('auth.forgot_password') }}?tab=id" class="extra-small text-muted text-decoration-none auth-link">아이디 찾기</a>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary-luxury w-100 py-3 font-sans fw-bold rounded-pill mb-4">
+                            로그인
+                        </button>
+                    </form>
+
+                    <!-- SNS 간편 로그인 디바이더 -->
+                    <div class="position-relative text-center my-4">
+                        <hr class="text-muted border-light-subtle">
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 extra-small text-muted font-sans">
+                            SNS 간편 로그인 / 계정 연동
+                        </span>
+                    </div>
+
+                    <!-- SNS 로그인 버튼 그룹 -->
+                    <div class="d-flex flex-column gap-2 mb-4">
+                        <!-- 카카오 로그인 -->
+                        <a href="{{ url_for('auth.oauth_login', provider='kakao') }}" class="btn btn-sns btn-kakao w-100 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 text-decoration-none">
+                            <i class="bi bi-chat-fill"></i>
+                            <span class="font-sans small fw-bold">카카오로 시작하기</span>
+                        </a>
+
+                        <!-- 네이버 로그인 -->
+                        <a href="{{ url_for('auth.oauth_login', provider='naver') }}" class="btn btn-sns btn-naver w-100 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 text-decoration-none">
+                            <span class="fw-bolder">N</span>
+                            <span class="font-sans small fw-bold">네이버로 시작하기</span>
+                        </a>
+
+                        <!-- 구글 로그인 -->
+                        <a href="{{ url_for('auth.oauth_login', provider='google') }}" class="btn btn-sns btn-google w-100 py-2 rounded-pill d-flex align-items-center justify-content-center gap-2 text-decoration-none">
+                            <i class="bi bi-google"></i>
+                            <span class="font-sans small fw-bold">구글 계정으로 시작하기</span>
+                        </a>
+                    </div>
+
+                    <!-- 회원가입 유도 -->
+                    <div class="text-center pt-3 border-top border-light-subtle">
+                        <p class="extra-small text-muted mb-0 font-sans">
+                            아직 VIBE 회원이 아니신가요? 
+                            <a href="{{ url_for('auth.register') }}" class="text-dark fw-bold text-decoration-underline ms-1">회원가입 (15% 쿠폰팩 지급)</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

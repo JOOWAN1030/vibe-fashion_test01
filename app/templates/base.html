@@ -63,7 +63,7 @@
                         </li>
                     </ul>
 
-                    <!-- 헤더 우측 유틸리티 액션 버튼 (검색, 찜, 장바구니) -->
+                    <!-- 헤더 우측 유틸리티 액션 버튼 (검색, 찜, 장바구니, 로그인/계정) -->
                     <div class="d-flex align-items-center gap-2 pt-2 pt-lg-0">
                         <div class="header-search-box d-none d-xl-flex align-items-center">
                             <i class="bi bi-search text-muted me-2"></i>
@@ -80,6 +80,33 @@
                             <span class="d-none d-sm-inline font-sans fw-semibold">BAG</span>
                             <span id="cartCount" class="badge-cart-pill">0</span>
                         </button>
+
+                        <!-- 회원 인증 메뉴 (로그인 상태에 따라 분기) -->
+                        {% if session.get('user') %}
+                        <div class="dropdown ms-1">
+                            <button class="btn btn-user-profile d-inline-flex align-items-center gap-2 dropdown-toggle" type="button" id="userMenuBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="user-avatar-circle"><i class="bi bi-person-fill"></i></span>
+                                <span class="small font-sans fw-semibold text-dark d-none d-md-inline">{{ session['user']['name'] }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 user-dropdown-menu" aria-labelledby="userMenuBtn">
+                                <li class="dropdown-header small text-muted font-sans">{{ session['user']['email'] }}</li>
+                                <li><a class="dropdown-item small py-2" href="#"><i class="bi bi-clock-history me-2"></i>주문 / 배송 조회</a></li>
+                                <li><a class="dropdown-item small py-2" href="#"><i class="bi bi-ticket-perforated me-2"></i>보유 쿠폰 (15% 웰컴팩)</a></li>
+                                <li><a class="dropdown-item small py-2" href="#"><i class="bi bi-heart me-2"></i>관심 상품 (위시리스트)</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item small py-2 text-danger" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right me-2"></i>로그아웃</a></li>
+                            </ul>
+                        </div>
+                        {% else %}
+                        <div class="d-flex align-items-center gap-1 ms-1">
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-auth-login small font-sans fw-semibold">
+                                로그인
+                            </a>
+                            <a href="{{ url_for('auth.register') }}" class="btn btn-auth-register small font-sans fw-semibold d-none d-sm-inline-block">
+                                회원가입
+                            </a>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
