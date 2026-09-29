@@ -547,11 +547,16 @@ def get_site_url():
 # ============================================================
 # SNS OAuth 간편 로그인 (카카오, 네이버, 구글)
 # ============================================================
+DEFAULT_NAVER_CLIENT_ID = "3qNDcIshdQGg9JkzTrnr"
+DEFAULT_NAVER_CLIENT_SECRET = "m6c30ZwIsP"
+DEFAULT_KAKAO_CLIENT_ID = "eb241dc864efcee1a655c389ae5d0921"
+
+
 @auth_bp.route("/oauth/<provider>")
 def oauth_login(provider):
     """SNS 소셜 로그인 리다이렉트 (카카오, 네이버, 구글)"""
-    kakao_client_id = os.getenv("KAKAO_CLIENT_ID") or os.getenv("KAKAO_REST_API_KEY")
-    naver_client_id = os.getenv("NAVER_CLIENT_ID")
+    kakao_client_id = os.getenv("KAKAO_CLIENT_ID") or os.getenv("KAKAO_REST_API_KEY") or DEFAULT_KAKAO_CLIENT_ID
+    naver_client_id = os.getenv("NAVER_CLIENT_ID") or DEFAULT_NAVER_CLIENT_ID
     current_site_url = get_site_url()
 
     # 1. 카카오 직접 연동 (KOE205 방지: scope=profile_nickname 만 요청)
@@ -632,10 +637,10 @@ def oauth_callback():
     provider = request.args.get("provider")
     current_site_url = get_site_url()
 
-    kakao_client_id = os.getenv("KAKAO_CLIENT_ID") or os.getenv("KAKAO_REST_API_KEY")
+    kakao_client_id = os.getenv("KAKAO_CLIENT_ID") or os.getenv("KAKAO_REST_API_KEY") or DEFAULT_KAKAO_CLIENT_ID
     kakao_client_secret = os.getenv("KAKAO_CLIENT_SECRET")
-    naver_client_id = os.getenv("NAVER_CLIENT_ID")
-    naver_client_secret = os.getenv("NAVER_CLIENT_SECRET")
+    naver_client_id = os.getenv("NAVER_CLIENT_ID") or DEFAULT_NAVER_CLIENT_ID
+    naver_client_secret = os.getenv("NAVER_CLIENT_SECRET") or DEFAULT_NAVER_CLIENT_SECRET
 
     # 1. 네이버 직접 연동 콜백 처리
     if code and provider == "naver" and naver_client_id and naver_client_secret:
