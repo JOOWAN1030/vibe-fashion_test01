@@ -15,6 +15,18 @@
                         <p class="text-muted small font-sans mb-0">당신만의 특별한 감각을 깨우는 프리미엄 쇼핑</p>
                     </div>
 
+                    <!-- 현재 로그인 상태 안내 배너 -->
+                    {% if session.get('user') %}
+                    <div class="alert alert-info py-2 px-3 rounded-3 extra-small d-flex align-items-center justify-content-between mb-3" role="alert">
+                        <div>
+                            <i class="bi bi-person-check-fill me-1"></i> 현재 <strong>{{ session['user']['name'] }}</strong>님으로 로그인되어 있습니다.
+                        </div>
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline-danger extra-small py-1 px-2 rounded-pill ms-2 text-decoration-none">
+                            로그아웃
+                        </a>
+                    </div>
+                    {% endif %}
+
                     <!-- URL 파라미터 알림 메시지 -->
                     {% if url_error %}
                         <div class="alert alert-danger alert-dismissible fade show extra-small py-2 px-3 rounded-3" role="alert">

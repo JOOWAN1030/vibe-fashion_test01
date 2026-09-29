@@ -91,11 +91,9 @@ def login_required(f):
 def login():
     """
     로그인 페이지 및 인증 처리
+    - 이미 로그인된 경우에도 로그인 화면 접근을 허용하고, 상단에 현재 계정 및 로그아웃 버튼 표시
     - 이메일 미인증 시 error=email_not_confirmed 파라미터와 함께 리다이렉트
     """
-    if "user_id" in session:
-        return redirect(url_for("main.index"))
-
     feedback = get_flash_feedback()
 
     if request.method == "POST":
@@ -105,6 +103,9 @@ def login():
 
         if not email or not password:
             return redirect(url_for("auth.login", error="missing_fields"))
+
+        # 새 로그인 시 기존 인증 세션 초기화 (장바구니는 유지)
+        clear_auth_session()
 
         try:
             if supabase:
@@ -170,9 +171,6 @@ def signup():
     회원가입 페이지 및 계정 생성
     - 가입 성공 시 /auth/signup-complete 로 리다이렉트
     """
-    if "user_id" in session:
-        return redirect(url_for("main.index"))
-
     feedback = get_flash_feedback()
 
     if request.method == "POST":
@@ -191,6 +189,7 @@ def signup():
             return redirect(url_for("auth.signup", error="password_too_short"))
 
         confirm_redirect_url = f"{SITE_URL}/auth/confirm"
+        clear_auth_session()
 
         try:
             if supabase:
