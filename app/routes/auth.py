@@ -572,14 +572,14 @@ def oauth_login(provider):
 
     if supabase:
         try:
-            # Supabase 기본 scope(account_email)를 덮어쓰기 위해 query_params에 scope 지정
+            import httpx
             oauth_options = {
                 "redirect_to": callback_url
             }
             if provider == "kakao":
                 oauth_options["query_params"] = {"scope": "profile_nickname"}
-            else:
-                oauth_options["scopes"] = "profile_nickname"
+            elif provider == "google":
+                oauth_options["query_params"] = {"access_type": "offline", "prompt": "consent"}
 
             res = supabase.auth.sign_in_with_oauth({
                 "provider": valid_providers[provider],
@@ -587,11 +587,16 @@ def oauth_login(provider):
             })
             oauth_url = getattr(res, "url", None) or (res.get("url") if isinstance(res, dict) else None)
             if oauth_url:
-                return redirect(oauth_url)
+                # 사전 검사: Supabase Provider가 미활성화되어 400 에러 JSON이 노출되는 상황 방어
+                check_res = httpx.get(oauth_url, follow_redirects=False, timeout=2.5)
+                if check_res.status_code in (301, 302, 303, 307):
+                    return redirect(oauth_url)
+                else:
+                    print(f"[OAuth Info] {provider} Provider 미활성화 상태({check_res.status_code}) -> 안내 메시지 처리", file=sys.stderr)
         except Exception as e:
             print(f"[OAuth Info] {provider} Supabase 연동 ({e})", file=sys.stderr)
 
-    # 3. 로컬 시뮬레이션
+    # 3. Provider 미설정 시 안전한 안내 및 테스트용 로그인 처리
     provider_names = {"kakao": "카카오", "naver": "네이버", "google": "구글"}
     p_name = provider_names.get(provider, provider)
     user_id = f"sns_{provider}_user"
@@ -601,7 +606,7 @@ def oauth_login(provider):
         "email": f"{provider}_user@vibe-fashion.com",
         "name": f"{p_name} 회원"
     }
-    flash(f"{p_name} 계정으로 간편 로그인되었습니다.", "success")
+    flash(f"{p_name} 계정으로 간편 로그인되었습니다. (Supabase 콘솔에서 Google Provider를 켜면 실제 구글 계정으로 연결됩니다)", "info")
     return redirect(url_for("main.index"))
 
 
