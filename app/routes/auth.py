@@ -528,6 +528,21 @@ def reset_password():
     )
 
 
+def get_site_url():
+    """현재 요청의 호스트 기반 또는 환경변수 SITE_URL 반환"""
+    env_site_url = os.getenv("SITE_URL")
+    if env_site_url:
+        return env_site_url.rstrip("/")
+    # 배포 환경에서 request.host_url 자동 감지 (예: https://...azurewebsites.net)
+    try:
+        from flask import request
+        if request and request.host_url:
+            return request.host_url.rstrip("/")
+    except Exception:
+        pass
+    return "http://localhost:5000"
+
+
 # ============================================================
 # SNS OAuth 간편 로그인 (카카오, 네이버, 구글)
 # ============================================================
@@ -535,10 +550,11 @@ def reset_password():
 def oauth_login(provider):
     """SNS 소셜 로그인 리다이렉트 (카카오, 네이버, 구글)"""
     kakao_client_id = os.getenv("KAKAO_CLIENT_ID") or os.getenv("KAKAO_REST_API_KEY")
+    current_site_url = get_site_url()
 
-    # 1. 카카오 직접 연동 (KOE205 invalid_scope 방지: scope=profile_nickname 만 요청)
+    # 1. 카카오 직접 연동 (KOE205 방지: scope=profile_nickname 만 요청)
     if provider == "kakao" and kakao_client_id:
-        redirect_uri = f"{SITE_URL}/auth/callback?provider=kakao"
+        redirect_uri = f"{current_site_url}/auth/callback?provider=kakao"
         kakao_auth_url = (
             f"https://kauth.kakao.com/oauth/authorize?"
             f"client_id={kakao_client_id}&redirect_uri={redirect_uri}&response_type=code&scope=profile_nickname"
@@ -551,16 +567,22 @@ def oauth_login(provider):
         flash("지원하지 않는 로그인 방식입니다.", "warning")
         return redirect(url_for("auth.login"))
 
-    callback_url = f"{SITE_URL}/auth/callback"
+    callback_url = f"{current_site_url}/auth/callback"
 
     if supabase:
         try:
+            # Supabase 기본 scope(account_email)를 덮어쓰기 위해 query_params에 scope 지정
+            oauth_options = {
+                "redirect_to": callback_url
+            }
+            if provider == "kakao":
+                oauth_options["query_params"] = {"scope": "profile_nickname"}
+            else:
+                oauth_options["scopes"] = "profile_nickname"
+
             res = supabase.auth.sign_in_with_oauth({
                 "provider": valid_providers[provider],
-                "options": {
-                    "redirect_to": callback_url,
-                    "scopes": "profile_nickname"
-                }
+                "options": oauth_options
             })
             oauth_url = getattr(res, "url", None) or (res.get("url") if isinstance(res, dict) else None)
             if oauth_url:
