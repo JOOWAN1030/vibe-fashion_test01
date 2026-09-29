@@ -551,6 +551,7 @@ def get_site_url():
 def oauth_login(provider):
     """SNS 소셜 로그인 리다이렉트 (카카오, 네이버, 구글)"""
     kakao_client_id = os.getenv("KAKAO_CLIENT_ID") or os.getenv("KAKAO_REST_API_KEY")
+    naver_client_id = os.getenv("NAVER_CLIENT_ID")
     current_site_url = get_site_url()
 
     # 1. 카카오 직접 연동 (KOE205 방지: scope=profile_nickname 만 요청)
@@ -562,7 +563,21 @@ def oauth_login(provider):
         )
         return redirect(kakao_auth_url)
 
-    # 2. Supabase OAuth Provider를 통한 연동
+    # 2. 네이버 직접 연동 (네이버 오픈API OAuth 2.0)
+    if provider == "naver" and naver_client_id:
+        import urllib.parse
+        import secrets
+        state = secrets.token_urlsafe(16)
+        session["naver_oauth_state"] = state
+        redirect_uri = f"{current_site_url}/auth/callback?provider=naver"
+        encoded_redirect_uri = urllib.parse.quote(redirect_uri, safe="")
+        naver_auth_url = (
+            f"https://nid.naver.com/oauth2.0/authorize?"
+            f"response_type=code&client_id={naver_client_id}&redirect_uri={encoded_redirect_uri}&state={state}"
+        )
+        return redirect(naver_auth_url)
+
+    # 3. Supabase OAuth Provider를 통한 연동
     valid_providers = {"kakao": "kakao", "naver": "naver", "google": "google"}
     if provider not in valid_providers:
         flash("지원하지 않는 로그인 방식입니다.", "warning")
@@ -587,7 +602,6 @@ def oauth_login(provider):
             })
             oauth_url = getattr(res, "url", None) or (res.get("url") if isinstance(res, dict) else None)
             if oauth_url:
-                # 사전 검사: Supabase Provider가 미활성화되어 400 에러 JSON이 노출되는 상황 방어
                 check_res = httpx.get(oauth_url, follow_redirects=False, timeout=2.5)
                 if check_res.status_code in (301, 302, 303, 307):
                     return redirect(oauth_url)
@@ -596,7 +610,7 @@ def oauth_login(provider):
         except Exception as e:
             print(f"[OAuth Info] {provider} Supabase 연동 ({e})", file=sys.stderr)
 
-    # 3. Provider 미설정 시 안전한 안내 및 테스트용 로그인 처리
+    # 4. Provider 미설정 시 안전한 안내 및 테스트용 로그인 처리
     provider_names = {"kakao": "카카오", "naver": "네이버", "google": "구글"}
     p_name = provider_names.get(provider, provider)
     user_id = f"sns_{provider}_user"
@@ -606,23 +620,70 @@ def oauth_login(provider):
         "email": f"{provider}_user@vibe-fashion.com",
         "name": f"{p_name} 회원"
     }
-    flash(f"{p_name} 계정으로 간편 로그인되었습니다. (Supabase 콘솔에서 Google Provider를 켜면 실제 구글 계정으로 연결됩니다)", "info")
+    flash(f"{p_name} 계정으로 간편 로그인되었습니다. (네이버 로그인을 활성화하려면 NAVER_CLIENT_ID와 NAVER_CLIENT_SECRET을 등록해 주세요)", "info")
     return redirect(url_for("main.index"))
 
 
 @auth_bp.route("/callback")
 def oauth_callback():
-    """OAuth 콜백 핸들러 (Supabase OAuth & 카카오 REST API 공용)"""
+    """OAuth 콜백 핸들러 (네이버 오픈API, 카카오 REST API, Supabase OAuth 공용)"""
     code = request.args.get("code")
+    state = request.args.get("state")
     provider = request.args.get("provider")
+    current_site_url = get_site_url()
+
     kakao_client_id = os.getenv("KAKAO_CLIENT_ID") or os.getenv("KAKAO_REST_API_KEY")
     kakao_client_secret = os.getenv("KAKAO_CLIENT_SECRET")
+    naver_client_id = os.getenv("NAVER_CLIENT_ID")
+    naver_client_secret = os.getenv("NAVER_CLIENT_SECRET")
 
-    # 1. 카카오 직접 연동 콜백 처리
+    # 1. 네이버 직접 연동 콜백 처리
+    if code and provider == "naver" and naver_client_id and naver_client_secret:
+        try:
+            import httpx
+            token_params = {
+                "grant_type": "authorization_code",
+                "client_id": naver_client_id,
+                "client_secret": naver_client_secret,
+                "code": code,
+                "state": state or ""
+            }
+            token_res = httpx.get("https://nid.naver.com/oauth2.0/token", params=token_params, timeout=5.0)
+            if token_res.status_code == 200:
+                token_json = token_res.json()
+                access_token = token_json.get("access_token")
+
+                if access_token:
+                    # 네이버 회원 프로필 조회 (이름, 닉네임, 이메일)
+                    user_res = httpx.get(
+                        "https://openapi.naver.com/v1/nid/me",
+                        headers={"Authorization": f"Bearer {access_token}"},
+                        timeout=5.0
+                    )
+                    if user_res.status_code == 200:
+                        user_json = user_res.json()
+                        naver_user = user_json.get("response", {})
+                        naver_id = naver_user.get("id", "naver_user")
+                        name = naver_user.get("name") or naver_user.get("nickname") or "네이버회원"
+                        email = naver_user.get("email") or f"naver_{naver_id[:8]}@vibe.com"
+
+                        session["user_id"] = f"naver_{naver_id}"
+                        session["user"] = {
+                            "id": session["user_id"],
+                            "email": email,
+                            "name": name
+                        }
+                        session["access_token"] = access_token
+                        flash(f"{name}님, 네이버 계정으로 로그인되었습니다!", "success")
+                        return redirect(url_for("main.index"))
+        except Exception as e:
+            print(f"[Naver OAuth Direct Error] {e}", file=sys.stderr)
+
+    # 2. 카카오 직접 연동 콜백 처리
     if code and (provider == "kakao" or kakao_client_id):
         try:
             import httpx
-            redirect_uri = f"{SITE_URL}/auth/callback?provider=kakao"
+            redirect_uri = f"{current_site_url}/auth/callback?provider=kakao"
             token_data = {
                 "grant_type": "authorization_code",
                 "client_id": kakao_client_id,
@@ -668,7 +729,7 @@ def oauth_callback():
         except Exception as e:
             print(f"[Kakao OAuth Direct Error] {e}", file=sys.stderr)
 
-    # 2. Supabase OAuth 콜백 (PKCE / Token Exchange)
+    # 3. Supabase OAuth 콜백 (구글/카카오 PKCE / Token Exchange)
     if code and supabase:
         try:
             res = supabase.auth.exchange_code_for_session({"auth_code": code})
