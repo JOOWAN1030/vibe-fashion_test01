@@ -15,6 +15,20 @@
                         <p class="text-muted small font-sans mb-0">신규 가입 즉시 15% 웰컴 쿠폰팩 &amp; 첫 구매 무료 배송 혜택</p>
                     </div>
 
+                    <!-- URL 파라미터 알림 메시지 -->
+                    {% if url_error %}
+                        <div class="alert alert-danger alert-dismissible fade show extra-small py-2 px-3 rounded-3" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ url_error }}
+                            <button type="button" class="btn-close py-2 px-3" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    {% if url_msg %}
+                        <div class="alert alert-success alert-dismissible fade show extra-small py-2 px-3 rounded-3" role="alert">
+                            <i class="bi bi-check-circle-fill me-1"></i> {{ url_msg }}
+                            <button type="button" class="btn-close py-2 px-3" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
                     <!-- 플래시 메시지 -->
                     {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}
@@ -42,7 +56,7 @@
                     </div>
 
                     <!-- 회원가입 폼 -->
-                    <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form">
+                    <form method="POST" action="{{ url_for('auth.signup') }}" class="auth-form">
                         <div class="mb-3">
                             <label for="name" class="form-label extra-small text-uppercase fw-bold text-muted font-sans">이름 / 닉네임</label>
                             <div class="input-group-modern">

@@ -1,25 +1,11 @@
 # app/routes/board.py - VIBE FASHION 문의 게시판 라우트 (상품문의 & 배송문의)
-import os
 import sys
 import uuid
 import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from dotenv import load_dotenv
-from supabase import create_client, Client
-
-load_dotenv()
+from app.supabase_client import supabase
 
 board_bp = Blueprint("board", __name__, url_prefix="/board")
-
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-
-supabase: Client | None = None
-if SUPABASE_URL and SUPABASE_ANON_KEY:
-    try:
-        supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
-    except Exception as e:
-        print(f"[Supabase Board Init Error] {e}", file=sys.stderr)
 
 # 로컬 메모리 저장소 (Supabase 테이블 생성 전이거나 네트워크 오류 시 안전하게 동작)
 IN_MEMORY_INQUIRIES = [

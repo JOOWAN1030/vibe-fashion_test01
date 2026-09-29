@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}이메일 인증 처리 중 - VIBE FASHION{% endblock %}
+
+{% block content %}
+<section class="auth-page-section py-5 d-flex align-items-center min-vh-75">
+    <div class="container py-md-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7 col-11">
+                <div class="auth-card p-4 p-md-5 rounded-4 shadow-lg border-0 bg-white text-center">
+                    <!-- 로딩 스피너 및 아이콘 -->
+                    <div id="loadingBox">
+                        <div class="spinner-border text-primary mb-3" role="status" style="width: 3.5rem; height: 3.5rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h4 class="font-serif fw-bold mb-2">이메일 인증을 확인하고 있습니다</h4>
+                        <p class="text-muted small font-sans mb-0">인증 정보를 확인 중입니다. 잠시만 기다려 주세요...</p>
+                    </div>
+
+                    <!-- 오류 발생 시 전환되는 영역 (기본 숨김) -->
+                    <div id="errorBox" class="d-none">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger-subtle text-danger p-3 mb-3" style="width: 70px; height: 70px;">
+                            <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+                        </div>
+                        <h4 class="font-serif fw-bold mb-2 text-danger">인증 처리 실패</h4>
+                        <p id="errorMessage" class="text-muted small font-sans mb-4">인증 링크가 유효하지 않거나 만료되었습니다.</p>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary-luxury w-100 py-3 font-sans fw-bold rounded-pill text-decoration-none">
+                            로그인 화면으로 이동
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Supabase가 리다이렉트 시 전달하는 URL 해시(#access_token=... 또는 #error=...) 파싱
+    const hash = window.location.hash.substring(1);
+    const search = window.location.search.substring(1);
+    const hashParams = new URLSearchParams(hash);
+    const searchParams = new URLSearchParams(search);
+
+    // 에러 파라미터 확인 (#error=... 또는 ?error=...)
+    const error = hashParams.get("error") || searchParams.get("error");
+    const errorDesc = hashParams.get("error_description") || searchParams.get("error_description") || hashParams.get("error_code");
+
+    if (error) {
+        showError(errorDesc || "유효하지 않거나 만료된 인증 링크입니다.");
+        setTimeout(() => {
+            window.location.replace("{{ url_for('auth.login') }}?error=invalid_token");
+        }, 1500);
+        return;
+    }
+
+    // 액세스 토큰 추출
+    const accessToken = hashParams.get("access_token");
+    const refreshToken = hashParams.get("refresh_token") || "";
+
+    if (accessToken) {
+        // 서버의 /auth/confirm 엔드포인트로 토큰 전송하여 Flask 세션 등록
+        fetch("{{ url_for('auth.confirm') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                access_token: accessToken,
+                refresh_token: refreshToken
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 세션 등록 성공 시 마이페이지로 이동
+                window.location.replace(data.redirect_url || "/mypage?msg=email_confirmed");
+            } else {
+                showError(data.error || "인증 정보를 저장하지 못했습니다.");
+                setTimeout(() => {
+                    window.location.replace("{{ url_for('auth.login') }}?error=invalid_token");
+                }, 1500);
+            }
+        })
+        .catch(err => {
+            console.error("Confirm fetch error:", err);
+            // 오류가 발생해도 토큰이 확인되었으므로 마이페이지 이동 시도
+            window.location.replace("/mypage?msg=email_confirmed");
+        });
+        return;
+    }
+
+    // 토큰도 에러도 없는 빈 요청인 경우
+    showError("유효한 인증 정보가 없습니다.");
+    setTimeout(() => {
+        window.location.replace("{{ url_for('auth.login') }}?error=invalid_token");
+    }, 1200);
+});
+
+function showError(msg) {
+    const loadingBox = document.getElementById("loadingBox");
+    const errorBox = document.getElementById("errorBox");
+    const errorMsgEl = document.getElementById("errorMessage");
+    if (loadingBox) loadingBox.classList.add("d-none");
+    if (errorBox) errorBox.classList.remove("d-none");
+    if (errorMsgEl) errorMsgEl.textContent = msg;
+}
+</script>
+{% endblock %}

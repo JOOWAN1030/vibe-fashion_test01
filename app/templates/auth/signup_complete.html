@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}가입 인증 메일 발송 - VIBE FASHION{% endblock %}
+
+{% block content %}
+<section class="auth-page-section py-5 d-flex align-items-center">
+    <div class="container py-md-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 col-11">
+                <div class="auth-card p-4 p-md-5 rounded-4 shadow-lg border-0 bg-white text-center">
+                    <!-- 아이콘 헤더 -->
+                    <div class="mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light text-primary p-4 mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-envelope-check-fill fs-1 text-primary"></i>
+                        </div>
+                        <span class="d-block badge badge-subtle-gold font-sans fw-bold mb-2">EMAIL VERIFICATION</span>
+                        <h2 class="auth-title font-serif fw-bold mb-2">인증 메일을 보냈습니다</h2>
+                        <p class="text-muted small font-sans mb-0">회원가입을 완료하기 위해 이메일 인증을 진행해 주세요.</p>
+                    </div>
+
+                    <!-- URL 파라미터 알림 메시지 -->
+                    {% if url_error %}
+                        <div class="alert alert-danger alert-dismissible fade show extra-small py-2 px-3 rounded-3 text-start mb-3" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i> {{ url_error }}
+                            <button type="button" class="btn-close py-2 px-3" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+                    {% if url_msg %}
+                        <div class="alert alert-success alert-dismissible fade show extra-small py-2 px-3 rounded-3 text-start mb-3" role="alert">
+                            <i class="bi bi-check-circle-fill me-1"></i> {{ url_msg }}
+                            <button type="button" class="btn-close py-2 px-3" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endif %}
+
+                    <!-- 안내 카드 -->
+                    <div class="alert alert-info py-3 px-4 rounded-3 text-start mb-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-info-circle-fill text-primary"></i>
+                            <strong class="font-sans small">발송 대상 이메일 계정</strong>
+                        </div>
+                        <div class="text-dark fw-bold font-sans fs-6 mb-2">
+                            {{ email or '입력하신 이메일' }}
+                        </div>
+                        <p class="extra-small text-muted mb-0 font-sans">
+                            수신함에서 발송된 인증 확인 메일의 링크를 클릭하시면 회원가입이 최종 완료되며, 
+                            자동으로 마이페이지로 이동합니다.
+                        </p>
+                    </div>
+
+                    <!-- 이메일 미수신 시 점검 안내 박스 -->
+                    <div class="card border-0 bg-light p-3 rounded-3 text-start mb-4">
+                        <div class="fw-bold small font-sans text-dark mb-2">
+                            <i class="bi bi-question-circle-fill text-warning me-1"></i> 받은편지함에 메일이 오지 않았나요?
+                        </div>
+                        <ul class="extra-small text-muted mb-3 ps-3 font-sans">
+                            <li class="mb-1"><strong>스팸 메일함 / 프로모션 탭:</strong> Gmail, 네이버 등에서 기본 인증 메일(발신자: <code>Supabase</code>)을 스팸으로 분류할 수 있습니다. 스팸함을 꼭 확인해 주세요.</li>
+                            <li class="mb-1"><strong>도착 지연:</strong> 네트워크 상황에 따라 최대 1~3분 정도 수신이 지연될 수 있습니다.</li>
+                            <li><strong>이미 인증된 계정:</strong> 이미 가입 및 인증이 완료된 이메일인 경우 보안상 새 인증 메일이 발송되지 않습니다. 바로 로그인해 보세요.</li>
+                        </ul>
+
+                        <!-- 인증 메일 재발송 폼 -->
+                        {% if email %}
+                        <form method="POST" action="{{ url_for('auth.resend_confirmation') }}">
+                            <input type="hidden" name="email" value="{{ email }}">
+                            <button type="submit" class="btn btn-outline-dark btn-sm w-100 py-2 rounded-pill font-sans">
+                                <i class="bi bi-arrow-repeat me-1"></i> 인증 메일 다시 보내기
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                    <!-- 버튼 액션 -->
+                    <div class="d-flex flex-column gap-2">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary-luxury w-100 py-3 font-sans fw-bold rounded-pill text-decoration-none">
+                            로그인 화면으로 이동
+                        </a>
+                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary w-100 py-2 font-sans small rounded-pill text-decoration-none">
+                            홈으로 돌아가기
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

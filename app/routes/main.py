@@ -1,26 +1,12 @@
-import os
+# app/routes/main.py - 메인 상품 전시 및 마이페이지 라우트
 import sys
 import traceback
-from flask import Blueprint, render_template
-from dotenv import load_dotenv
-from supabase import create_client, Client
+from flask import Blueprint, render_template, session, request
+from app.supabase_client import supabase
+from app.routes.auth import login_required
 
-# .env 환경 변수 로드
-load_dotenv()
-
-# 메인 기능용 Blueprint 객체 생성
 main_bp = Blueprint("main", __name__)
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-
-supabase: Client | None = None
-if SUPABASE_URL and SUPABASE_ANON_KEY:
-    try:
-        supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
-    except Exception as e:
-        print(f"[Supabase Init Error] {e}", file=sys.stderr)
-        traceback.print_exc()
 
 @main_bp.route("/")
 def index():
@@ -139,4 +125,17 @@ def index():
         products = []
 
     return render_template("index.html", products=products, categories=categories)
+
+
+@main_bp.route("/mypage")
+@login_required
+def mypage():
+    """
+    회원 마이페이지
+    - login_required 검사 (미인증 시 /auth/login 으로 이동)
+    """
+    user = session.get("user") or {"id": session.get("user_id"), "email": "user@example.com", "name": "회원"}
+    msg = request.args.get("msg")
+    url_msg = "이메일 인증이 성공적으로 완료되었습니다!" if msg == "email_confirmed" else None
+    return render_template("mypage.html", user=user, url_msg=url_msg)
 

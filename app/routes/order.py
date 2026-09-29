@@ -1,25 +1,11 @@
 # app/routes/order.py - VIBE STORE 장바구니 및 모의 주문/결제 라우트
-import os
 import sys
 import uuid
 import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
-from dotenv import load_dotenv
-from supabase import create_client, Client
-
-load_dotenv()
+from app.supabase_client import supabase
 
 order_bp = Blueprint("order", __name__, url_prefix="/order")
-
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-
-supabase: Client | None = None
-if SUPABASE_URL and SUPABASE_ANON_KEY:
-    try:
-        supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
-    except Exception as e:
-        print(f"[Supabase Order Init Error] {e}", file=sys.stderr)
 
 
 def get_cart():
