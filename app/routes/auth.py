@@ -529,15 +529,16 @@ def reset_password():
 
 
 def get_site_url():
-    """현재 요청의 호스트 기반 또는 환경변수 SITE_URL 반환"""
+    """현재 요청의 호스트 기반 또는 환경변수 SITE_URL 반환 (HTTPS 스킴 보장)"""
     env_site_url = os.getenv("SITE_URL")
     if env_site_url:
         return env_site_url.rstrip("/")
-    # 배포 환경에서 request.host_url 자동 감지 (예: https://...azurewebsites.net)
     try:
         from flask import request
-        if request and request.host_url:
-            return request.host_url.rstrip("/")
+        if request and request.host:
+            # Azure 배포 환경(azurewebsites.net)은 항상 https 사용
+            scheme = "https" if "azurewebsites.net" in request.host or request.is_secure else request.scheme
+            return f"{scheme}://{request.host}".rstrip("/")
     except Exception:
         pass
     return "http://localhost:5000"
