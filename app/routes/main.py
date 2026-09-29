@@ -68,12 +68,15 @@ def index():
                     try:
                         sale_int = int(float(sale_price))
                         formatted_price = f"{sale_int:,}원"
+                        numeric_price = sale_int
                         if orig_int > sale_int and orig_int > 0:
                             discount_rate = int(round((orig_int - sale_int) / orig_int * 100))
                     except (ValueError, TypeError):
                         formatted_price = f"{sale_price}원"
+                        numeric_price = orig_int
                 else:
                     formatted_price = formatted_orig_price
+                    numeric_price = orig_int
 
                 # 썸네일 이미지 추출
                 thumbnail_url = item.get("thumbnail_url") or item.get("image_url")
@@ -110,6 +113,8 @@ def index():
                     "reviews": brand_meta["reviews"],
                     "tag": brand_meta["tag"],
                     "price": formatted_price,
+                    "price_num": numeric_price,
+                    "created_at": item.get("created_at") or "",
                     "original_price": formatted_orig_price if discount_rate else None,
                     "discount_rate": discount_rate,
                     "thumbnail_url": thumbnail_url,

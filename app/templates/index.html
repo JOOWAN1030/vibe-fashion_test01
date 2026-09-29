@@ -47,32 +47,75 @@
             </div>
         </div>
 
-        <!-- 카테고리 필터 탭 -->
+        <!-- 카테고리 필터 탭 (전체, 상의, 하의, 아우터, 액세서리) -->
         <div class="ms-filter-tabs">
             <button type="button" class="ms-filter-pill active" onclick="filterCategory('all', this)">
                 전체
-            </button>
-            <button type="button" class="ms-filter-pill" onclick="filterCategory('outer', this)">
-                아우터
             </button>
             <button type="button" class="ms-filter-pill" onclick="filterCategory('top', this)">
                 상의
             </button>
             <button type="button" class="ms-filter-pill" onclick="filterCategory('bottom', this)">
-                바지
+                하의
             </button>
-            <button type="button" class="ms-filter-pill" onclick="filterCategory('shoes', this)">
-                스니커즈
+            <button type="button" class="ms-filter-pill" onclick="filterCategory('outer', this)">
+                아우터
             </button>
-            <button type="button" class="ms-filter-pill" onclick="filterCategory('dress', this)">
-                원피스/세트
+            <button type="button" class="ms-filter-pill" onclick="filterCategory('acc', this)">
+                액세서리
             </button>
+        </div>
+
+        <!-- 상품 탐색 컨트롤 바 (실시간 검색창 + 정렬 드롭다운) -->
+        <div class="ms-catalog-controls d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3 mb-4 p-3 bg-light rounded-3 border">
+            <!-- 실시간 상품명/태그 검색창 -->
+            <div class="ms-catalog-search-wrap flex-grow-1 position-relative">
+                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                <input type="text" 
+                       id="productSearchInput" 
+                       class="form-control form-control-sm ps-5 pe-5 rounded-pill py-2 border-secondary-subtle" 
+                       placeholder="상품명 또는 태그 검색 (예: 티셔츠, 무료배송, 오버핏 등)"
+                       oninput="handleSearch(this.value)">
+                <button type="button" 
+                        id="searchClearBtn" 
+                        class="btn btn-link position-absolute top-50 end-0 translate-middle-y text-muted text-decoration-none p-0 me-3 d-none" 
+                        onclick="clearSearchInput()"
+                        title="검색어 지우기">
+                    <i class="bi bi-x-circle-fill"></i>
+                </button>
+            </div>
+
+            <!-- 결과 개수 및 정렬 옵션 드롭다운 -->
+            <div class="d-flex align-items-center justify-content-between justify-content-md-end gap-3 flex-shrink-0">
+                <div class="text-muted extra-small">
+                    총 <strong id="productCount" class="text-dark">{{ products|length }}</strong>개 상품
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <label for="productSortSelect" class="form-label mb-0 extra-small text-muted fw-bold text-nowrap">
+                        <i class="bi bi-sort-down me-1"></i>정렬
+                    </label>
+                    <select id="productSortSelect" 
+                            class="form-select form-select-sm rounded-pill border-secondary-subtle extra-small fw-semibold py-2 ps-3 pe-4 bg-white" 
+                            style="min-width: 140px;" 
+                            onchange="handleSort(this.value)">
+                        <option value="newest" selected>신상품순</option>
+                        <option value="price-asc">가격 낮은순</option>
+                        <option value="price-desc">가격 높은순</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <!-- 상품 카드 그리드 (Desktop 3열, Tablet 2열, Mobile 2열로 쾌적한 비례감 확보) -->
         <div class="row g-3 g-md-4 row-cols-2 row-cols-md-3 row-cols-lg-3 row-cols-xl-3" id="productGrid">
             {% for product in products %}
-            <div class="col product-item-col" data-category="{{ product.category_slug }}">
+            <div class="col product-item-col" 
+                 data-category="{{ product.category_slug }}"
+                 data-name="{{ product.name }}"
+                 data-tag="{{ product.tag }}"
+                 data-brand="{{ product.brand }}"
+                 data-price="{{ product.price_num }}"
+                 data-date="{{ product.created_at }}">
                 <div class="ms-goods-card">
                     <!-- 썸네일 박스 -->
                     <div class="ms-thumb-box">
@@ -146,11 +189,13 @@
 
         <!-- 검색/필터 결과 없음 상태 표시용 -->
         <div id="noResultsState" class="text-center py-5 d-none">
-            <i class="bi bi-search fs-1 text-muted mb-3 d-block"></i>
-            <h5 class="fw-bold text-dark">검색 결과가 없습니다</h5>
-            <p class="text-muted small">다른 검색어나 카테고리를 선택해 보세요.</p>
-            <button class="btn btn-dark rounded-0 px-4 mt-2 extra-small fw-bold" onclick="resetFilters()">
-                전체 상품 보기
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light text-muted p-4 mb-3" style="width: 80px; height: 80px;">
+                <i class="bi bi-search fs-1 text-muted"></i>
+            </div>
+            <h4 class="fw-bold text-dark font-sans mb-2">검색 결과가 없습니다</h4>
+            <p class="text-muted small mb-4">입력하신 검색어 또는 선택하신 카테고리에 해당하는 상품이 없습니다.<br>다른 검색어를 입력하시거나 카테고리를 다시 선택해 보세요.</p>
+            <button type="button" class="btn btn-dark rounded-pill px-4 py-2 font-sans small fw-bold" onclick="resetAllFilters()">
+                <i class="bi bi-arrow-repeat me-1"></i> 전체 목록 보기
             </button>
         </div>
     </div>

@@ -465,6 +465,43 @@ a:hover {
     font-weight: 700;
 }
 
+/* 상품 목록 탐색 컨트롤 바 (실시간 검색 + 정렬) */
+.ms-catalog-controls {
+    background-color: #f8fafc;
+    border: 1px solid var(--ms-gray-200);
+    transition: var(--ms-transition);
+}
+
+.ms-catalog-search-wrap .form-control {
+    font-size: 0.85rem;
+    transition: var(--ms-transition);
+}
+
+.ms-catalog-search-wrap .form-control:focus {
+    border-color: var(--ms-black);
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.08);
+    background-color: #ffffff;
+}
+
+#productSortSelect {
+    cursor: pointer;
+    font-size: 0.82rem;
+    transition: var(--ms-transition);
+}
+
+#productSortSelect:focus {
+    border-color: var(--ms-black);
+    box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.08);
+}
+
+#searchClearBtn {
+    font-size: 0.95rem;
+}
+
+#searchClearBtn:hover {
+    color: var(--ms-black) !important;
+}
+
 /* ============================================================
    9. 무신사 시그니처 상품 카드 (Musinsa Goods Card - Rebalanced)
    ============================================================ */
