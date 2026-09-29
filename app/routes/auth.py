@@ -528,16 +528,20 @@ def reset_password():
 
 
 def get_site_url():
-    """현재 요청의 호스트 기반 또는 환경변수 SITE_URL 반환 (HTTPS 스킴 보장)"""
+    """현재 요청의 호스트 기반 또는 환경변수 SITE_URL 반환 (HTTPS 스킴 보장 및 localhost 통일)"""
     env_site_url = os.getenv("SITE_URL")
     if env_site_url:
         return env_site_url.rstrip("/")
     try:
         from flask import request
         if request and request.host:
+            # 127.0.0.1로 접속한 경우에도 네이버/카카오 Redirect URI 일치를 위해 localhost:5000으로 정규화
+            host = request.host
+            if "127.0.0.1:5000" in host:
+                return "http://localhost:5000"
             # Azure 배포 환경(azurewebsites.net)은 항상 https 사용
-            scheme = "https" if "azurewebsites.net" in request.host or request.is_secure else request.scheme
-            return f"{scheme}://{request.host}".rstrip("/")
+            scheme = "https" if "azurewebsites.net" in host or request.is_secure else request.scheme
+            return f"{scheme}://{host}".rstrip("/")
     except Exception:
         pass
     return "http://localhost:5000"
