@@ -1,0 +1,1 @@
+D:\home\site\wwwroot\.venv\Scripts\gunicorn --bind=0.0.0.0:8000 --workers=4 --threads=2 --worker-class=gthread --timeout=60 --access-logfile - --error-logfile - run:app
