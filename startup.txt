@@ -1,4 +1,0 @@
-REM Azure App Service Python 시작 스크립트
-REM Gunicorn WSGI 서버로 Flask 애플리케이션 실행
-
-%PYTHON_EXE% -m gunicorn --bind=0.0.0.0:8000 --workers=2 --worker-class=gthread --threads=2 --timeout=60 run:app

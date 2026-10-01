@@ -18,3 +18,22 @@ instance/
 .pytest_cache/
 *.pyc
 .DS_Store
+
+# 임시 진단 및 테스트 파일
+test_*.py
+check_*.py
+diagnose_*.py
+analyze_*.py
+verify_*.py
+*REPORT*.py
+*SOLUTION*.py
+*GUIDE*
+*MONITORING*
+*DEBUG*
+debug_*.py
+debug_*.html
+full_path_analysis.py
+recreate_carts.py
+final_route_test.py
+find_all_product_items.py
+CART_*.md

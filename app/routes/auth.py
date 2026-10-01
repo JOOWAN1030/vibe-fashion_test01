@@ -4,7 +4,7 @@ import sys
 from functools import wraps
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from supabase_auth.errors import AuthApiError
-from app.supabase_client import supabase
+from app.supabase_client import supabase, get_supabase_admin
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -64,8 +64,29 @@ def get_flash_feedback():
 
 def clear_auth_session():
     """인증 관련 세션 데이터만 정리하고, 장바구니 등 사용자 상태는 보존"""
-    for key in ("user_id", "user", "access_token", "refresh_token"):
+    for key in ("user_id", "user", "email", "username", "logged_in", "access_token", "refresh_token", "auth_provider"):
         session.pop(key, None)
+
+
+def get_user_display_name(user):
+    """
+    OAuth / 회원 사용자의 표시 이름을 안전하게 추출:
+    username -> full_name -> name -> 이메일 @ 앞부분 -> 기본값('회원')
+    """
+    if not user:
+        return "회원"
+    meta = getattr(user, "user_metadata", None) or {}
+    email = getattr(user, "email", "") or ""
+
+    name = (
+        meta.get("username")
+        or meta.get("full_name")
+        or meta.get("name")
+    )
+    if not name and email and "@" in email:
+        name = email.split("@")[0]
+
+    return name or "회원"
 
 
 # ============================================================
@@ -117,13 +138,32 @@ def login():
                     user_data = {
                         "id": auth_res.user.id,
                         "email": auth_res.user.email,
-                        "name": (auth_res.user.user_metadata or {}).get("name", email.split("@")[0])
+                        "name": (auth_res.user.user_metadata or {}).get("name", email.split("@")[0]),
+                        "provider": "email"
                     }
                     session["user_id"] = auth_res.user.id
                     session["user"] = user_data
+                    session["auth_provider"] = "email"
                     if auth_res.session:
                         session["access_token"] = auth_res.session.access_token
                         session["refresh_token"] = auth_res.session.refresh_token
+
+                    # profiles 테이블에 사용자 프로필 생성 (DB 트리거 미동작 시 백업)
+                    try:
+                        db_client = get_supabase_admin() or supabase
+                        profile_check = db_client.table("profiles").select("id").eq("id", auth_res.user.id).maybe_single().execute()
+                        if not profile_check.data:
+                            # 프로필이 없으면 생성
+                            db_client.table("profiles").insert({
+                                "id": auth_res.user.id,
+                                "email": auth_res.user.email,
+                                "name": user_data["name"]
+                            }).execute()
+                            print(f"[Login] profiles 신규 생성: {auth_res.user.id}", file=sys.stderr)
+                        else:
+                            print(f"[Login] profiles 기존 프로필 확인: {auth_res.user.id}", file=sys.stderr)
+                    except Exception as profile_err:
+                        print(f"[Login] profiles 생성 실패 (무시하고 계속): {profile_err}", file=sys.stderr)
 
                     flash(f"{user_data['name']}님, 환영합니다!", "success")
                     if next_url and next_url.startswith("/"):
@@ -132,9 +172,10 @@ def login():
                 else:
                     return redirect(url_for("auth.login", error="invalid_credentials", email=email))
             else:
-                user_data = {"id": "demo-user", "email": email, "name": email.split("@")[0]}
+                user_data = {"id": "demo-user", "email": email, "name": email.split("@")[0], "provider": "email"}
                 session["user_id"] = user_data["id"]
                 session["user"] = user_data
+                session["auth_provider"] = "email"
                 flash(f"{user_data['name']}님, 환영합니다! (데모 모드)", "info")
                 return redirect(url_for("main.index"))
 
@@ -312,8 +353,10 @@ def confirm():
                     session["user"] = {
                         "id": user.id,
                         "email": user.email,
-                        "name": name
+                        "name": name,
+                        "provider": "email"
                     }
+                    session["auth_provider"] = "email"
                     session["access_token"] = access_token
                     if refresh_token:
                         session["refresh_token"] = refresh_token
@@ -321,6 +364,21 @@ def confirm():
                         supabase.auth.set_session(access_token, refresh_token or "")
                     except Exception:
                         pass
+                    
+                    # profiles 테이블에 사용자 프로필 생성 (DB 트리거 미동작 시 백업)
+                    try:
+                        db_client = get_supabase_admin() or supabase
+                        profile_check = db_client.table("profiles").select("id").eq("id", user.id).maybe_single().execute()
+                        if not profile_check.data:
+                            db_client.table("profiles").insert({
+                                "id": user.id,
+                                "email": user.email,
+                                "name": name
+                            }).execute()
+                            print(f"[Confirm POST] profiles 신규 생성: {user.id}", file=sys.stderr)
+                    except Exception as profile_err:
+                        print(f"[Confirm POST] profiles 생성 실패 (무시하고 계속): {profile_err}", file=sys.stderr)
+                    
                     return jsonify({"success": True, "redirect_url": "/mypage?msg=email_confirmed"})
                 else:
                     return jsonify({"success": False, "error": "invalid_token"}), 400
@@ -329,8 +387,10 @@ def confirm():
                 session["user"] = {
                     "id": "demo-confirmed-user",
                     "email": "user@vibe.com",
-                    "name": "인증완료회원"
+                    "name": "인증완료회원",
+                    "provider": "email"
                 }
+                session["auth_provider"] = "email"
                 return jsonify({"success": True, "redirect_url": "/mypage?msg=email_confirmed"})
         except Exception as e:
             print(f"[Supabase Token Verification Error] {e}", file=sys.stderr)
@@ -379,13 +439,29 @@ def confirm():
                     user_data = {
                         "id": auth_res.user.id,
                         "email": auth_res.user.email,
-                        "name": (auth_res.user.user_metadata or {}).get("name", auth_res.user.email.split("@")[0])
+                        "name": (auth_res.user.user_metadata or {}).get("name", auth_res.user.email.split("@")[0]),
+                        "provider": "email"
                     }
                     session["user_id"] = auth_res.user.id
                     session["user"] = user_data
+                    session["auth_provider"] = "email"
                     if auth_res.session:
                         session["access_token"] = auth_res.session.access_token
                         session["refresh_token"] = auth_res.session.refresh_token
+
+                    # profiles 테이블에 사용자 프로필 생성 (DB 트리거 미동작 시 백업)
+                    try:
+                        db_client = get_supabase_admin() or supabase
+                        profile_check = db_client.table("profiles").select("id").eq("id", auth_res.user.id).maybe_single().execute()
+                        if not profile_check.data:
+                            db_client.table("profiles").insert({
+                                "id": auth_res.user.id,
+                                "email": auth_res.user.email,
+                                "name": user_data["name"]
+                            }).execute()
+                            print(f"[Confirm GET] profiles 신규 생성: {auth_res.user.id}", file=sys.stderr)
+                    except Exception as profile_err:
+                        print(f"[Confirm GET] profiles 생성 실패 (무시하고 계속): {profile_err}", file=sys.stderr)
 
                     flash("이메일 인증이 성공적으로 완료되었습니다!", "success")
                     return redirect("/mypage?msg=email_confirmed")
@@ -396,8 +472,10 @@ def confirm():
                 session["user"] = {
                     "id": "demo-confirmed-user",
                     "email": email or "user@vibe.com",
-                    "name": "인증완료회원"
+                    "name": "인증완료회원",
+                    "provider": "email"
                 }
+                session["auth_provider"] = "email"
                 flash("이메일 인증이 완료되었습니다 (데모).", "success")
                 return redirect("/mypage?msg=email_confirmed")
 
@@ -616,11 +694,27 @@ def oauth_login(provider):
             })
             oauth_url = getattr(res, "url", None) or (res.get("url") if isinstance(res, dict) else None)
             if oauth_url:
-                check_res = httpx.get(oauth_url, follow_redirects=False, timeout=2.5)
-                if check_res.status_code in (301, 302, 303, 307):
+                # Supabase PKCE code_verifier를 Flask 세션에 백업하여
+                # Azure Gunicorn 멀티 워커/인스턴스 환경에서도 콜백 시 검증할 수 있도록 보존
+                try:
+                    storage_key = f"{supabase.auth._storage_key}-code-verifier"
+                    verifier = supabase.auth._storage.get_item(storage_key)
+                    if verifier:
+                        session["oauth_code_verifier"] = verifier
+                    session["oauth_provider"] = provider
+                    session.modified = True
+                except Exception as verifier_err:
+                    print(f"[OAuth Info] code_verifier 백업 오류: {verifier_err}", file=sys.stderr)
+
+                try:
+                    check_res = httpx.get(oauth_url, follow_redirects=False, timeout=3.0)
+                    if check_res.status_code in (301, 302, 303, 307):
+                        return redirect(oauth_url)
+                    else:
+                        print(f"[OAuth Info] {provider} Provider 미활성화 상태({check_res.status_code}) -> 안내 메시지 처리", file=sys.stderr)
+                except Exception as net_err:
+                    print(f"[OAuth Info] {provider} 사전 연결 검사 생략 후 직접 리다이렉트 ({net_err})", file=sys.stderr)
                     return redirect(oauth_url)
-                else:
-                    print(f"[OAuth Info] {provider} Provider 미활성화 상태({check_res.status_code}) -> 안내 메시지 처리", file=sys.stderr)
         except Exception as e:
             print(f"[OAuth Info] {provider} Supabase 연동 ({e})", file=sys.stderr)
 
@@ -632,8 +726,10 @@ def oauth_login(provider):
     session["user"] = {
         "id": user_id,
         "email": f"{provider}_user@vibe-fashion.com",
-        "name": f"{p_name} 회원"
+        "name": f"{p_name} 회원",
+        "provider": provider
     }
+    session["auth_provider"] = provider
     flash(f"{p_name} 계정으로 간편 로그인되었습니다. (네이버 로그인을 활성화하려면 NAVER_CLIENT_ID와 NAVER_CLIENT_SECRET을 등록해 주세요)", "info")
     return redirect(url_for("main.index"))
 
@@ -690,14 +786,37 @@ def oauth_callback():
                         naver_id = naver_user.get("id", "naver_user")
                         name = naver_user.get("name") or naver_user.get("nickname") or "네이버회원"
                         email = naver_user.get("email") or f"naver_{naver_id[:8]}@vibe.com"
+                        
+                        # UUID 타입 user_id 생성 (profiles.id는 UUID 컬럼)
+                        import uuid
+                        user_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"naver_{naver_id}"))
 
-                        session["user_id"] = f"naver_{naver_id}"
+                        session["user_id"] = user_id
                         session["user"] = {
-                            "id": session["user_id"],
+                            "id": user_id,
                             "email": email,
-                            "name": name
+                            "name": name,
+                            "provider": "naver"
                         }
+                        session["auth_provider"] = "naver"
                         session["access_token"] = access_token
+                        
+                        # profiles 테이블에 사용자 프로필 자동 생성 (네이버 로그인 후)
+                        try:
+                            db_client = get_supabase_admin() or supabase
+                            profile_check = db_client.table("profiles").select("id").eq("id", user_id).maybe_single().execute()
+                            if not (profile_check and profile_check.data):
+                                db_client.table("profiles").insert({
+                                    "id": user_id,
+                                    "email": email,
+                                    "name": name
+                                }).execute()
+                                print(f"[Naver Callback] profiles 신규 생성: {user_id}", file=sys.stderr)
+                            else:
+                                print(f"[Naver Callback] profiles 기존 프로필 확인: {user_id}", file=sys.stderr)
+                        except Exception as profile_err:
+                            print(f"[Naver Callback] profiles 생성 실패 (무시하고 계속): {profile_err}", file=sys.stderr)
+                        
                         flash(f"{name}님, 네이버 계정으로 로그인되었습니다!", "success")
                         return redirect(url_for("main.index"))
         except Exception as e:
@@ -742,15 +861,38 @@ def oauth_callback():
                     profile = kakao_account.get("profile", {})
                     nickname = profile.get("nickname") or f"카카오회원_{user_info.get('id')}"
                     email = kakao_account.get("email") or f"kakao_{user_info.get('id')}@vibe.com"
+                    
+                    # UUID 타입 user_id 생성 (profiles.id는 UUID 컬럼)
+                    import uuid
+                    user_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, f"kakao_{user_info.get('id')}"))
 
-                    session["user_id"] = f"kakao_{user_info.get('id')}"
+                    session["user_id"] = user_id
                     session["user"] = {
-                        "id": session["user_id"],
+                        "id": user_id,
                         "email": email,
-                        "name": nickname
+                        "name": nickname,
+                        "provider": "kakao"
                     }
+                    session["auth_provider"] = "kakao"
                     if access_token:
                         session["access_token"] = access_token
+                    
+                    # profiles 테이블에 사용자 프로필 자동 생성 (카카오 로그인 후)
+                    try:
+                        db_client = get_supabase_admin() or supabase
+                        profile_check = db_client.table("profiles").select("id").eq("id", user_id).maybe_single().execute()
+                        if not (profile_check and profile_check.data):
+                            db_client.table("profiles").insert({
+                                "id": user_id,
+                                "email": email,
+                                "name": nickname
+                            }).execute()
+                            print(f"[Kakao Callback] profiles 신규 생성: {user_id}", file=sys.stderr)
+                        else:
+                            print(f"[Kakao Callback] profiles 기존 프로필 확인: {user_id}", file=sys.stderr)
+                    except Exception as profile_err:
+                        print(f"[Kakao Callback] profiles 생성 실패 (무시하고 계속): {profile_err}", file=sys.stderr)
+                    
                     flash(f"{nickname}님, 카카오 계정으로 로그인되었습니다!", "success")
                     return redirect(url_for("main.index"))
             else:
@@ -760,34 +902,107 @@ def oauth_callback():
 
         # 카카오 토큰 발급에 실패했거나 Client Secret 활성화로 인해 KOE010이 발생한 경우에도
         # 사용자가 인증을 거쳤으므로 데모/테스트 사용자 세션을 안정적으로 생성하여 로그인을 보장
-        session["user_id"] = "kakao_user"
+        import uuid
+        user_id = str(uuid.uuid5(uuid.NAMESPACE_DNS, "kakao_fallback_user"))
+        session["user_id"] = user_id
         session["user"] = {
-            "id": "kakao_user",
+            "id": user_id,
             "email": "kakao_member@vibe-fashion.com",
-            "name": "카카오 회원"
+            "name": "카카오 회원",
+            "provider": "kakao"
         }
+        session["auth_provider"] = "kakao"
+        
+        # profiles 테이블에 폴백 사용자 프로필 생성
+        try:
+            db_client = get_supabase_admin() or supabase
+            profile_check = db_client.table("profiles").select("id").eq("id", user_id).maybe_single().execute()
+            if not (profile_check and profile_check.data):
+                db_client.table("profiles").insert({
+                    "id": user_id,
+                    "email": session["user"]["email"],
+                    "name": session["user"]["name"]
+                }).execute()
+                print(f"[Kakao Fallback] profiles 신규 생성: {user_id}", file=sys.stderr)
+        except Exception as profile_err:
+            print(f"[Kakao Fallback] profiles 생성 실패 (무시): {profile_err}", file=sys.stderr)
+        
         flash("카카오 계정으로 간편 로그인되었습니다.", "success")
         return redirect(url_for("main.index"))
 
     # 3. Supabase OAuth 콜백 (구글/카카오 PKCE / Token Exchange)
     if code and supabase:
+        print("[OAuth Callback] 콜백 진입: authorization_code 수신됨 (code 존재=True)", file=sys.stderr)
         try:
-            res = supabase.auth.exchange_code_for_session({"auth_code": code})
+            exchange_params = {"auth_code": code}
+            code_verifier = session.pop("oauth_code_verifier", None)
+            if code_verifier:
+                exchange_params["code_verifier"] = code_verifier
+                # Supabase SDK storage에도 동기화
+                try:
+                    supabase.auth._storage.set_item(f"{supabase.auth._storage_key}-code-verifier", code_verifier)
+                except Exception:
+                    pass
+
+            res = supabase.auth.exchange_code_for_session(exchange_params)
+            has_session = bool(res and res.session)
+            has_user = bool(res and res.user)
+            print(f"[OAuth Callback] Supabase session 생성: {has_session}, user 존재: {has_user}", file=sys.stderr)
+
             if res and res.user:
-                name = (res.user.user_metadata or {}).get("name") or res.user.email.split("@")[0]
-                session["user_id"] = res.user.id
+                user = res.user
+                user_id = user.id
+                email = user.email or ""
+                metadata_keys = list((user.user_metadata or {}).keys())
+                print(f"[OAuth Callback] user.id 존재: {bool(user_id)}, user.email 존재: {bool(email)}", file=sys.stderr)
+                print(f"[OAuth Callback] user_metadata key 목록: {metadata_keys}", file=sys.stderr)
+
+                name = get_user_display_name(user)
+                app_meta = getattr(user, "app_metadata", {}) or {}
+                oauth_provider = app_meta.get("provider") or provider or session.pop("oauth_provider", None) or "google"
+
+                # Flask Session 저장
+                session["user_id"] = user_id
+                session["email"] = email
+                session["username"] = name
+                session["logged_in"] = True
+                session["auth_provider"] = oauth_provider
                 session["user"] = {
-                    "id": res.user.id,
-                    "email": res.user.email,
-                    "name": name
+                    "id": user_id,
+                    "email": email,
+                    "name": name,
+                    "provider": oauth_provider
                 }
                 if res.session:
                     session["access_token"] = res.session.access_token
                     session["refresh_token"] = res.session.refresh_token
+                session.modified = True
+                print(f"[OAuth Callback] Flask session user_id 저장 완료: {session.get('user_id') == user_id}", file=sys.stderr)
+
+                # profiles 테이블 자동 생성/동기화 (DB 트리거 미동작 시 백업)
+                db_client = get_supabase_admin() or supabase
+                try:
+                    profile_res = db_client.table("profiles").select("id").eq("id", user_id).maybe_single().execute()
+                    if not (profile_res and profile_res.data):
+                        avatar_url = (user.user_metadata or {}).get("avatar_url") or (user.user_metadata or {}).get("picture")
+                        db_client.table("profiles").upsert({
+                            "id": user_id,
+                            "email": email,
+                            "name": name,
+                            "avatar_url": avatar_url
+                        }).execute()
+                        print("[OAuth Callback] profiles 신규 생성/동기화 성공", file=sys.stderr)
+                    else:
+                        print("[OAuth Callback] profiles 기존 프로필 확인 성공", file=sys.stderr)
+                except Exception as profile_err:
+                    print(f"[OAuth Callback] profiles 조회/생성 실패 (무시하고 계속 진행): {profile_err}", file=sys.stderr)
+
                 flash(f"{name}님, 간편 로그인이 완료되었습니다!", "success")
                 return redirect(url_for("main.index"))
+            else:
+                print("[OAuth Callback] exchange_code_for_session 결과 user 객체 없음", file=sys.stderr)
         except Exception as e:
-            print(f"[Supabase OAuth Exchange Error] {e}", file=sys.stderr)
+            print(f"[OAuth Callback] Supabase OAuth Exchange 실패: {e}", file=sys.stderr)
 
     flash("간편 로그인이 완료되었습니다.", "success")
     return redirect(url_for("main.index"))
