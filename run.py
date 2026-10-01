@@ -6,5 +6,5 @@ app = create_app()
 
 if __name__ == "__main__":
     # 개발 서버 실행 (디버그 모드 활성화)
-    print("🚀 VIBE FASHION 쇼핑몰 서버가 시작됩니다! ()")
+    print("🚀 VIBE FASHION 쇼핑몰 서버가 시작됩니다! (업데이트됨)")
     app.run(host="127.0.0.1", port=5000, debug=True)
