@@ -133,9 +133,9 @@
                         </button>
 
                         <!-- 상품 이미지 (안정적인 프레임 센터링) -->
-                        <div class="ms-img-wrapper">
+                        <a href="/products/{{ product.id }}" class="ms-img-wrapper d-block text-decoration-none">
                             <img src="{{ product.thumbnail_url }}" alt="{{ product.name }}" class="ms-thumb-img" loading="lazy">
-                        </div>
+                        </a>
 
                         <!-- 호버 시 퀵 장바구니 담기 바 -->
                         <button type="button" 
@@ -155,7 +155,7 @@
                         </div>
 
                         <!-- 상품명 (충분한 높이와 가독성 있는 폰트 사이즈) -->
-                        <a href="javascript:void(0)" class="ms-goods-title" title="{{ product.name }}">
+                        <a href="/products/{{ product.id }}" class="ms-goods-title" title="{{ product.name }}">
                             {{ product.name }}
                         </a>
 
