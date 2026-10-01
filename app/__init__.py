@@ -97,17 +97,6 @@ def create_app():
             "version": "1.0.0"
         }), 200
 
-    # 에러 핸들러
-    @app.errorhandler(404)
-    def not_found(e):
-        logger.warning(f"404 Not Found: {e}")
-        return jsonify({"error": "Not Found", "message": str(e)}), 404
-
-    @app.errorhandler(500)
-    def internal_error(e):
-        logger.error(f"500 Internal Server Error: {e}")
-        return jsonify({"error": "Internal Server Error", "message": str(e)}), 500
-
     logger.info("=" * 60)
     logger.info("✅ Flask 애플리케이션 시작 완료!")
     logger.info("=" * 60)
