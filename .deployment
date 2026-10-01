@@ -1,0 +1,5 @@
+[config]
+command = deploy.cmd
+
+[deployment]
+ignoreStackTrace = false
