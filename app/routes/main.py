@@ -132,15 +132,73 @@ def index():
     return render_template("index.html", products=products, categories=categories)
 
 
-@main_bp.route("/mypage")
+@main_bp.route("/mypage", methods=["GET", "POST"])
 @login_required
 def mypage():
     """
     회원 마이페이지
     - login_required 검사 (미인증 시 /auth/login 으로 이동)
+    - profiles 테이블에서 로그인 사용자 정보(name, email, address, phone 등) 조회
+    - POST 요청 시 기본 배송지 및 회원 정보 수정 지원
     """
-    user = session.get("user") or {"id": session.get("user_id"), "email": "user@example.com", "name": "회원"}
+    user_id = session.get("user_id")
+    session_user = session.get("user") or {}
     msg = request.args.get("msg")
     url_msg = "이메일 인증이 성공적으로 완료되었습니다!" if msg == "email_confirmed" else None
-    return render_template("mypage.html", user=user, url_msg=url_msg)
+
+    profile = {
+        "id": user_id,
+        "email": session_user.get("email", ""),
+        "name": session_user.get("name", "회원"),
+        "phone": "",
+        "address": "",
+        "grade": "BRONZE",
+    }
+
+    # Supabase profiles 테이블 조회
+    if supabase and user_id:
+        try:
+            res = supabase.table("profiles").select("*").eq("id", user_id).maybe_single().execute()
+            if res and res.data:
+                profile.update(res.data)
+            elif not res or not res.data:
+                # 프로필 레코드가 없을 경우 세션 정보 바탕으로 초기 생성 시도
+                try:
+                    init_data = {
+                        "id": user_id,
+                        "email": session_user.get("email", ""),
+                        "name": session_user.get("name", "회원"),
+                    }
+                    supabase.table("profiles").insert(init_data).execute()
+                    profile.update(init_data)
+                except Exception:
+                    pass
+        except Exception as e:
+            print(f"[Supabase Notice] 프로필 조회 실패: {e}", file=sys.stderr)
+
+    # 정보 수정 폼 제출 (POST) 처리
+    if request.method == "POST":
+        new_name = request.form.get("name", "").strip()
+        new_phone = request.form.get("phone", "").strip()
+        new_address = request.form.get("address", "").strip()
+
+        update_payload = {
+            "name": new_name or profile["name"],
+            "phone": new_phone,
+            "address": new_address,
+        }
+
+        if supabase and user_id:
+            try:
+                supabase.table("profiles").update(update_payload).eq("id", user_id).execute()
+                profile.update(update_payload)
+                # 세션 내 user 객체 정보도 갱신
+                if "user" in session and isinstance(session["user"], dict):
+                    session["user"]["name"] = profile["name"]
+                    session.modified = True
+                url_msg = "회원 정보가 성공적으로 수정되었습니다."
+            except Exception as e:
+                print(f"[Supabase Error] 프로필 수정 실패: {e}", file=sys.stderr)
+
+    return render_template("mypage.html", user=profile, profile=profile, url_msg=url_msg)
 
