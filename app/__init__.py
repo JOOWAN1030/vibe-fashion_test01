@@ -83,10 +83,15 @@ def create_app():
         logger.error(f"❌ Blueprint 등록 실패: {e}")
         raise
 
-    # 요구사항 루트 URL 지원: POST /cart/add
+    # 요구사항 루트 URL 지원: POST /cart/add 및 GET /cart
     @app.route("/cart/add", methods=["POST"])
     def root_cart_add():
         return handle_cart_add_logic()
+
+    @app.route("/cart", methods=["GET"])
+    def root_cart():
+        from flask import redirect, url_for
+        return redirect(url_for("order.cart_view"))
 
     # 헬스 체크 라우트
     @app.route("/health", methods=["GET"])
@@ -112,8 +117,4 @@ def create_app():
     logger.info("✅ Flask 애플리케이션 시작 완료!")
     logger.info("=" * 60)
     
-    return app
-    def root_cart_add():
-        return handle_cart_add_logic()
-
     return app

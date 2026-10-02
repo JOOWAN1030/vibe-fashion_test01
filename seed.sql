@@ -155,10 +155,10 @@ WHERE p.slug = 'wide-denim-pants'
 
 -- 상품 3: 오버핏 코튼 자켓 이미지
 INSERT INTO public.product_images (product_id, image_url, is_primary, sort_order)
-SELECT p.id, 'https://covernat.co.kr/web/product/extra/big/20251015/766dc5d2a11b0417d5c9e746f56facc3.jpg', true, 1
+SELECT p.id, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRWMkETzhdociepQrfO2N4yaq2SXAWiYdWUdIUUEIQ255vtqlB5NJkpOfl&s=10', true, 1
 FROM public.products p
 WHERE p.slug = 'overfit-cotton-jacket'
-  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://covernat.co.kr/web/product/extra/big/20251015/766dc5d2a11b0417d5c9e746f56facc3.jpg');
+  AND NOT EXISTS (SELECT 1 FROM public.product_images pi WHERE pi.product_id = p.id AND pi.image_url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRWMkETzhdociepQrfO2N4yaq2SXAWiYdWUdIUUEIQ255vtqlB5NJkpOfl&s=10');
 
 -- 상품 4: 플로럴 미디 원피스 이미지
 INSERT INTO public.product_images (product_id, image_url, is_primary, sort_order)

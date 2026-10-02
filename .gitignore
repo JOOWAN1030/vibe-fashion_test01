@@ -26,12 +26,15 @@ diagnose_*.py
 analyze_*.py
 verify_*.py
 *REPORT*.py
+*REPORT*.md
 *SOLUTION*.py
 *GUIDE*
 *MONITORING*
 *DEBUG*
 debug_*.py
 debug_*.html
+fix_*.py
+update_*.py
 full_path_analysis.py
 recreate_carts.py
 final_route_test.py
